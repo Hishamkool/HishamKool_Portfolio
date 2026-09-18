@@ -7,15 +7,14 @@ import {
   GraduationCap,
   House,
   Mail,
-  Moon,
   Sparkles,
-  SunMedium,
   Trophy,
   Zap,
 } from "lucide-react";
 import { InView } from "react-intersection-observer";
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
+import { LiquidDock } from "./components/LiquidDock";
 
 type NavItem = {
   id: string;
@@ -626,46 +625,15 @@ function App() {
       </main>
 
       <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center px-3 pb-[max(1rem,env(safe-area-inset-bottom))] md:px-6">
-        <GlassPanel className="pointer-events-auto flex items-center gap-2 rounded-[28px] border border-[var(--color-border-glass)] bg-[var(--color-surface-glass)] p-2 shadow-[0_10px_40px_0_var(--shadow-glass)] backdrop-blur-[24px]">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = item.id === activeSection;
-
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => scrollToSection(item.id)}
-                aria-label={item.label}
-                className="relative flex h-12 w-12 items-center justify-center rounded-full text-[var(--color-text-primary)] transition-colors md:h-14 md:w-14"
-              >
-                {isActive && (
-                  <motion.span
-                    layoutId="dock-indicator"
-                    className="absolute inset-0 rounded-full border border-[var(--color-border-glass)] bg-[var(--color-surface)]/80"
-                    transition={{ type: "spring", stiffness: 350, damping: 25 }}
-                  />
-                )}
-                <Icon className="relative z-10 h-4 w-4 md:h-5 md:w-5" />
-              </button>
-            );
-          })}
-
-          <button
-            type="button"
-            onClick={() =>
-              setTheme((current) => (current === "light" ? "dark" : "light"))
-            }
-            aria-label="Toggle color mode"
-            className="relative flex h-12 w-12 items-center justify-center rounded-full text-[var(--color-text-primary)] md:h-14 md:w-14"
-          >
-            {theme === "light" ? (
-              <Moon className="h-4 w-4 md:h-5 md:w-5" />
-            ) : (
-              <SunMedium className="h-4 w-4 md:h-5 md:w-5" />
-            )}
-          </button>
-        </GlassPanel>
+        <LiquidDock
+          navItems={navItems}
+          activeSection={activeSection}
+          onNavigate={scrollToSection}
+          theme={theme}
+          onToggleTheme={() =>
+            setTheme((current) => (current === "light" ? "dark" : "light"))
+          }
+        />
       </div>
     </div>
   );
