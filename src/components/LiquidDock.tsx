@@ -7,7 +7,13 @@ import {
   type MotionValue,
 } from "framer-motion";
 import { Moon, SunMedium } from "lucide-react";
-import { useRef, useState, type MouseEvent } from "react";
+import {
+  forwardRef,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type MouseEvent,
+} from "react";
 import type { LucideIcon } from "lucide-react";
 
 export type DockNavItem = {
@@ -55,33 +61,31 @@ function useMagnify(
   };
 }
 
-function DockIcon({
-  icon: Icon,
-  label,
-  index,
-  slotCount,
-  mouseFraction,
-  isActive,
-  onClick,
-}: {
-  icon: LucideIcon;
-  label: string;
-  index: number;
-  slotCount: number;
-  mouseFraction: MotionValue<number>;
-  isActive?: boolean;
-  onClick: () => void;
-}) {
-  const centerFraction = (index + 0.5) / slotCount;
+const DockIcon = forwardRef<
+  HTMLButtonElement,
+  {
+    icon: LucideIcon;
+    label: string;
+    centerFraction: number;
+    slotCount: number;
+    mouseFraction: MotionValue<number>;
+    isActive?: boolean;
+    onClick: () => void;
+  }
+>(function DockIcon(
+  { icon: Icon, label, centerFraction, slotCount, mouseFraction, isActive, onClick },
+  ref,
+) {
   const { scale, y } = useMagnify(mouseFraction, centerFraction, slotCount);
 
   return (
     <motion.button
+      ref={ref}
       type="button"
       onClick={onClick}
       aria-label={label}
       style={{ scale, y }}
-      className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full text-[var(--color-text-primary)] md:h-14 md:w-14"
+      className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full text-[var(--color-text-primary)] md:h-14 md:w-14 lg:h-20 lg:w-20"
     >
       {isActive && (
         <motion.span
@@ -90,10 +94,10 @@ function DockIcon({
           transition={{ type: "spring", stiffness: 350, damping: 25 }}
         />
       )}
-      <Icon className="relative z-10 h-4 w-4 md:h-5 md:w-5" />
+      <Icon className="relative z-10 h-4 w-4 md:h-5 md:w-5 lg:h-7 lg:w-7" />
     </motion.button>
   );
-}
+});
 
 export function LiquidDock({
   navItems,
@@ -103,6 +107,7 @@ export function LiquidDock({
   onToggleTheme,
 }: LiquidDockProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const mouseFraction = useMotionValue(NO_HOVER);
   const dropX = useMotionValue(0.5);
   const dropTrail = useSpring(dropX, {
@@ -113,6 +118,35 @@ export function LiquidDock({
   const [hovering, setHovering] = useState(false);
 
   const slotCount = navItems.length + 1;
+
+  // Icon centers are measured from the real DOM layout rather than assumed
+  // to be evenly spread across the container, since padding/gaps mean the
+  // two don't match — that mismatch made the magnify effect peak off-center.
+  const [centers, setCenters] = useState<number[]>(
+    Array.from({ length: slotCount }, (_, index) => (index + 0.5) / slotCount),
+  );
+
+  useLayoutEffect(() => {
+    const measure = () => {
+      const containerRect = containerRef.current?.getBoundingClientRect();
+      if (!containerRect || containerRect.width === 0) return;
+      const next = itemRefs.current.map((el, index) => {
+        if (!el) return (index + 0.5) / slotCount;
+        const rect = el.getBoundingClientRect();
+        return (
+          (rect.left + rect.width / 2 - containerRect.left) /
+          containerRect.width
+        );
+      });
+      setCenters(next);
+    };
+
+    measure();
+
+    const observer = new ResizeObserver(measure);
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [slotCount]);
 
   const handleMove = (event: MouseEvent<HTMLDivElement>) => {
     const rect = containerRef.current?.getBoundingClientRect();
@@ -141,7 +175,7 @@ export function LiquidDock({
       ref={containerRef}
       onMouseMove={handleMove}
       onMouseLeave={handleLeave}
-      className="liquid-glass pointer-events-auto relative flex items-center gap-1.5 overflow-hidden rounded-[28px] border border-[var(--color-border-glass)] bg-[var(--color-surface-glass)] p-2 shadow-[0_10px_40px_0_var(--shadow-glass)] md:gap-2"
+      className="liquid-glass pointer-events-auto relative flex items-center gap-1.5 rounded-[28px] border border-[var(--color-border-glass)] bg-[var(--color-surface-glass)] p-2 shadow-[0_10px_40px_0_var(--shadow-glass)] md:gap-2 lg:gap-3 lg:rounded-[36px] lg:p-3"
     >
       <svg
         width="0"
@@ -164,32 +198,37 @@ export function LiquidDock({
         </defs>
       </svg>
 
-      <motion.div
-        aria-hidden="true"
-        style={{ backgroundPosition: sheenPosition }}
-        className="liquid-sheen pointer-events-none absolute inset-[-40%] z-[1]"
-      />
-
-      {hovering && (
-        <div
+      <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]">
+        <motion.div
           aria-hidden="true"
-          style={{ filter: "url(#dock-goo)" }}
-          className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-        >
-          <motion.span className="drop-blob" style={{ left: dropLeft }} />
-          <motion.span
-            className="drop-blob drop-blob--trail"
-            style={{ left: dropTrailLeft }}
-          />
-        </div>
-      )}
+          style={{ backgroundPosition: sheenPosition }}
+          className="liquid-sheen absolute inset-[-40%] z-[1]"
+        />
+
+        {hovering && (
+          <div
+            aria-hidden="true"
+            style={{ filter: "url(#dock-goo)" }}
+            className="absolute inset-0 z-0"
+          >
+            <motion.span className="drop-blob" style={{ left: dropLeft }} />
+            <motion.span
+              className="drop-blob drop-blob--trail"
+              style={{ left: dropTrailLeft }}
+            />
+          </div>
+        )}
+      </div>
 
       {navItems.map((item, index) => (
         <DockIcon
           key={item.id}
+          ref={(el) => {
+            itemRefs.current[index] = el;
+          }}
           icon={item.icon}
           label={item.label}
-          index={index}
+          centerFraction={centers[index] ?? (index + 0.5) / slotCount}
           slotCount={slotCount}
           mouseFraction={mouseFraction}
           isActive={item.id === activeSection}
@@ -198,9 +237,14 @@ export function LiquidDock({
       ))}
 
       <DockIcon
+        ref={(el) => {
+          itemRefs.current[navItems.length] = el;
+        }}
         icon={theme === "light" ? Moon : SunMedium}
         label="Toggle color mode"
-        index={navItems.length}
+        centerFraction={
+          centers[navItems.length] ?? (navItems.length + 0.5) / slotCount
+        }
         slotCount={slotCount}
         mouseFraction={mouseFraction}
         onClick={onToggleTheme}
