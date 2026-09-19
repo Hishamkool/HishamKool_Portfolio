@@ -11,9 +11,11 @@ import {
   House,
   Languages as LanguagesIcon,
   Mail,
+  Search,
   Sparkles,
   User,
   Users,
+  X,
   Zap,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -36,12 +38,15 @@ type Project = {
   description: string;
   stack: string[];
   image: string;
+  featured: boolean;
+  internalNote?: string;
   links: {
     github?: string;
     live?: string;
     appStore?: string;
     playStore?: string;
     figma?: string;
+    download?: string;
   };
 };
 
@@ -57,6 +62,7 @@ type TimelineNode = {
   bullets: string[];
   projects?: string;
   certificate?: string;
+  countsTowardExperience?: boolean;
   icon: typeof BriefcaseBusiness;
 };
 
@@ -202,6 +208,7 @@ const timelineNodes: TimelineNode[] = [
     ],
     projects: "Password Generator, Houseme",
     certificate: "verify.cabin4.pro/v8uj",
+    countsTowardExperience: false,
     icon: GraduationCap,
   },
 ];
@@ -211,6 +218,7 @@ const projects: Project[] = [
     slug: "benjamin-portfolio",
     title: "Benjamin Portfolio",
     category: "Freelance",
+    featured: true,
     description:
       "A fully responsive freelance portfolio for a designer & video editor — a parallax scrolling homepage and a separate map-style interactive homepage, with a Cloudinary-powered media library built from a custom Figma design.",
     stack: ["React", "Tailwind CSS", "Cloudinary", "EmailJS", "Vercel"],
@@ -226,17 +234,21 @@ const projects: Project[] = [
     slug: "automax",
     title: "Automax",
     category: "React",
+    featured: true,
     description:
       "Enterprise workflow automation platform for managing business operations, user access, and organizational structure with enterprise-grade security. Expanding into React Native for mobile-friendly features.",
     stack: ["React.js", "React Native", "Enterprise", "Workflow Automation"],
     image:
       "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=900&q=80",
-    links: {},
+    links: {
+      live: "https://epmstg.automaxsw.com/login",
+    },
   },
   {
     slug: "recipedia",
     title: "Recipedia",
     category: "React",
+    featured: true,
     description:
       "A recipe discovery app with search and category browsing, built during the Vonnue full-stack internship.",
     stack: ["React", "Tailwind CSS", "JavaScript"],
@@ -250,6 +262,7 @@ const projects: Project[] = [
     slug: "daily-logs-calculator",
     title: "Daily Logs Calculator",
     category: "React",
+    featured: true,
     description:
       "A utility app for tracking and calculating daily work and activity logs, with a clean, form-driven interface.",
     stack: ["React", "Tailwind CSS", "JavaScript"],
@@ -263,6 +276,7 @@ const projects: Project[] = [
     slug: "meal-cast",
     title: "Meal Cast",
     category: "React",
+    featured: false,
     description:
       "A meal planning and forecasting interface with a clean, card-based UI for browsing and organizing meals.",
     stack: ["React", "Tailwind CSS", "JavaScript"],
@@ -270,12 +284,14 @@ const projects: Project[] = [
       "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80",
     links: {
       github: "https://github.com/Hishamkool/MealCast",
+      live: "https://meal-cast.vercel.app",
     },
   },
   {
     slug: "dice-game",
     title: "Dice Game",
     category: "React",
+    featured: true,
     description:
       "An interactive dice game with real-time state updates and score tracking.",
     stack: ["React", "JavaScript"],
@@ -289,6 +305,7 @@ const projects: Project[] = [
     slug: "amoled-clock",
     title: "Amoled Clock",
     category: "React",
+    featured: true,
     description:
       "A minimal, dark-themed digital clock UI optimized for AMOLED screens.",
     stack: ["React", "Tailwind CSS"],
@@ -302,6 +319,7 @@ const projects: Project[] = [
     slug: "doordash-clone",
     title: "Doordash (Clone)",
     category: "React",
+    featured: true,
     description:
       "A food delivery UI clone focused on responsive restaurant listings and cart flows.",
     stack: ["React", "Tailwind CSS", "JavaScript"],
@@ -315,6 +333,7 @@ const projects: Project[] = [
     slug: "airbnb-clone",
     title: "AirBnb (Clone)",
     category: "React",
+    featured: true,
     description:
       "A property listing and booking UI clone with search, filters, and a responsive listing grid.",
     stack: ["React", "Tailwind CSS", "JavaScript"],
@@ -328,6 +347,7 @@ const projects: Project[] = [
     slug: "biosynthesis",
     title: "Biosynthesis",
     category: "React",
+    featured: true,
     description:
       "An educational interactive UI visualizing the biosynthesis process, built with Firestore-backed content.",
     stack: ["React", "Tailwind CSS", "Firestore"],
@@ -341,6 +361,7 @@ const projects: Project[] = [
     slug: "cssd",
     title: "CSSD",
     category: "Flutter",
+    featured: true,
     description:
       "A Central Sterile Services Department app streamlining hospital sterilization workflow tracking.",
     stack: ["Flutter", "Dart", "Provider", "Firebase"],
@@ -357,6 +378,7 @@ const projects: Project[] = [
     slug: "dialog",
     title: "DiaLog",
     category: "Flutter",
+    featured: true,
     description:
       "A patient health-log tracking app for recording and monitoring daily diagnostics.",
     stack: ["Flutter", "Dart", "Provider", "Firebase"],
@@ -372,50 +394,59 @@ const projects: Project[] = [
     slug: "grapes-office-log",
     title: "Grapes Office Log",
     category: "Flutter",
+    featured: true,
     description:
       "An employee attendance and office activity log management app for internal operations.",
     stack: ["Flutter", "Dart", "Provider", "Firebase"],
     image:
       "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=900&q=80",
+    internalNote: "Internal App",
     links: {},
   },
   {
     slug: "smart-device-management",
     title: "Smart Device Management",
     category: "Flutter",
+    featured: true,
     description:
       "An app for controlling and monitoring connected smart devices with real-time status updates.",
     stack: ["Flutter", "Dart", "Provider", "Firebase Cloud Messaging"],
     image:
       "https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=900&q=80",
+    internalNote: "Internal App",
     links: {},
   },
   {
     slug: "myhrm-qr",
     title: "MyHRM QR",
     category: "Flutter",
+    featured: false,
     description:
-      "A QR-based HR management app for employee check-in/check-out and attendance records.",
+      "A QR-based HR management app for employee check-in/check-out and attendance records. Superseded by the Grapes IDMR web application.",
     stack: ["Flutter", "Dart", "Provider", "REST API"],
     image:
       "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=900&q=80",
+    internalNote: "Internal App",
     links: {},
   },
   {
     slug: "nameboard",
     title: "NameBoard",
     category: "Flutter",
+    featured: true,
     description:
       "A digital nameboard and smart signage display management app for kiosk-style screens.",
     stack: ["Flutter", "Dart", "MVC"],
     image:
       "https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=900&q=80",
+    internalNote: "Internal App",
     links: {},
   },
   {
     slug: "bsa",
     title: "BSA",
     category: "Flutter",
+    featured: true,
     description:
       "Bedside Assistant — a vital-history section within Grapes' bedside assistant suite, built for patient care workflows.",
     stack: ["Flutter", "Dart", "MVVM"],
@@ -431,6 +462,7 @@ const projects: Project[] = [
     slug: "password-generator",
     title: "Password Generator",
     category: "JavaScript",
+    featured: true,
     description:
       "A password generator web app that creates strong random passwords, built with vanilla JavaScript during the Cabin4 internship to practice DOM manipulation and logic-building.",
     stack: ["HTML", "CSS", "JavaScript"],
@@ -438,25 +470,29 @@ const projects: Project[] = [
       "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80",
     links: {
       github: "https://github.com/Hishamkool/random-password-generator",
+      live: "https://hishamkool.github.io/random-password-generator/",
     },
   },
   {
     slug: "houseme",
     title: "Houseme",
     category: "JavaScript",
+    featured: false,
     description:
-      "A static website built during the Cabin4 internship to practice responsive front-end layout and structure using HTML, CSS, and JavaScript.",
+      "A static website recreated during the Cabin4 internship to practice responsive front-end layout and structure using HTML, CSS, and JavaScript.",
     stack: ["HTML", "CSS", "JavaScript"],
     image:
       "https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=900&q=80",
     links: {
       github: "https://github.com/Hishamkool/Houseme",
+      live: "https://hishamkool.github.io/Houseme/",
     },
   },
   {
     slug: "news-app",
     title: "News App",
     category: "Flutter",
+    featured: true,
     description:
       "A news reader app fetching live articles from a public API, built while training in Flutter and REST API integration.",
     stack: ["Flutter", "Dart", "REST API"],
@@ -464,12 +500,14 @@ const projects: Project[] = [
       "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=900&q=80",
     links: {
       github: "https://github.com/Hishamkool/newsApp_api",
+      download: "https://github.com/Hishamkool/newsApp_api/releases",
     },
   },
   {
     slug: "movie-app",
     title: "Movie App",
     category: "Flutter",
+    featured: true,
     description:
       "A movie browsing app for discovering films and viewing details, built with Flutter during Luminar Technolab training.",
     stack: ["Flutter", "Dart"],
@@ -477,12 +515,14 @@ const projects: Project[] = [
       "https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=900&q=80",
     links: {
       github: "https://github.com/Hishamkool/movieui_flutter",
+      download: "https://github.com/Hishamkool/movieui_flutter/releases",
     },
   },
   {
     slug: "hotel-booking-app",
     title: "Hotel Booking App",
     category: "Flutter",
+    featured: false,
     description:
       "A hotel booking UI for browsing rooms and making reservations, built with Flutter during Luminar Technolab training.",
     stack: ["Flutter", "Dart"],
@@ -490,12 +530,14 @@ const projects: Project[] = [
       "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=900&q=80",
     links: {
       github: "https://github.com/Hishamkool/hotel_app_flutter",
+      download: "https://github.com/Hishamkool/hotel_app_flutter/releases",
     },
   },
   {
     slug: "exotic-car-app",
     title: "Exotic Car App",
     category: "Flutter",
+    featured: true,
     description:
       "An exotic car showcase app with a rich, image-driven UI, built with Flutter during Luminar Technolab training.",
     stack: ["Flutter", "Dart"],
@@ -503,12 +545,14 @@ const projects: Project[] = [
       "https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=900&q=80",
     links: {
       github: "https://github.com/Hishamkool/Car_App_Flutter",
+      download: "https://github.com/Hishamkool/Car_App_Flutter/releases",
     },
   },
   {
     slug: "instagram-clone",
     title: "Instagram Clone",
     category: "Flutter",
+    featured: false,
     description:
       "An Instagram UI clone practicing feed layouts, stories, and profile screens in Flutter during Luminar Technolab training.",
     stack: ["Flutter", "Dart"],
@@ -516,6 +560,8 @@ const projects: Project[] = [
       "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=900&q=80",
     links: {
       github: "https://github.com/Hishamkool/instagramuiClone_flutter",
+      download:
+        "https://github.com/Hishamkool/instagramuiClone_flutter/releases",
     },
   },
 ];
@@ -621,10 +667,14 @@ const easing = [0.22, 1, 0.36, 1] as const;
 const MS_PER_YEAR = 1000 * 60 * 60 * 24 * 365.25;
 
 function getYearsOfExperience(nodes: TimelineNode[]): number {
-  const earliestStart = Math.min(
-    ...nodes.map((node) => new Date(node.start).getTime()),
-  );
-  const years = (Date.now() - earliestStart) / MS_PER_YEAR;
+  const totalMs = nodes
+    .filter((node) => node.countsTowardExperience !== false)
+    .reduce((sum, node) => {
+      const start = new Date(node.start).getTime();
+      const end = node.end ? new Date(node.end).getTime() : Date.now();
+      return sum + Math.max(0, end - start);
+    }, 0);
+  const years = totalMs / MS_PER_YEAR;
   return Math.max(0, Math.round(years * 10) / 10);
 }
 
@@ -648,6 +698,9 @@ function App() {
   const [activeSection, setActiveSection] = useState("home");
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [projectFilter, setProjectFilter] = useState("All");
+  const [projectSearch, setProjectSearch] = useState("");
+  const [searchDescriptions, setSearchDescriptions] = useState(false);
+  const [showAllProjects, setShowAllProjects] = useState(false);
   const [scrollDirection, setScrollDirection] = useState<"up" | "down">(
     "down",
   );
@@ -674,9 +727,35 @@ function App() {
   );
 
   const filteredProjects = useMemo(() => {
-    if (projectFilter === "All") return projects;
-    return projects.filter((project) => project.category === projectFilter);
-  }, [projectFilter]);
+    const byCategory =
+      projectFilter === "All"
+        ? projects
+        : projects.filter((project) => project.category === projectFilter);
+
+    const query = projectSearch.trim().toLowerCase();
+    if (!query) return byCategory;
+
+    return byCategory.filter((project) => {
+      const matchesTitle = project.title.toLowerCase().includes(query);
+      const matchesDescription =
+        searchDescriptions &&
+        project.description.toLowerCase().includes(query);
+      return matchesTitle || matchesDescription;
+    });
+  }, [projectFilter, projectSearch, searchDescriptions]);
+
+  const hiddenProjectCount = useMemo(
+    () => filteredProjects.filter((project) => !project.featured).length,
+    [filteredProjects],
+  );
+
+  const visibleProjects = useMemo(
+    () =>
+      showAllProjects
+        ? filteredProjects
+        : filteredProjects.filter((project) => project.featured),
+    [filteredProjects, showAllProjects],
+  );
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
@@ -1116,12 +1195,75 @@ function App() {
             ))}
           </GlassPanel>
 
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <GlassPanel className="flex flex-1 items-center gap-2 px-4 py-2.5">
+              <Search className="h-4 w-4 shrink-0 text-[var(--color-text-muted)]" />
+              <input
+                type="text"
+                value={projectSearch}
+                onChange={(event) => setProjectSearch(event.target.value)}
+                placeholder="Search projects by name…"
+                className="w-full bg-transparent text-sm text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-muted)]"
+              />
+              {projectSearch && (
+                <button
+                  type="button"
+                  onClick={() => setProjectSearch("")}
+                  aria-label="Clear search"
+                  className="shrink-0 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </GlassPanel>
+
+            <button
+              type="button"
+              onClick={() => setSearchDescriptions((current) => !current)}
+              className={`flex shrink-0 items-center gap-2 rounded-full border px-4 py-2.5 text-xs font-medium uppercase tracking-[0.12em] transition-colors ${
+                searchDescriptions
+                  ? "border-[var(--color-accent-blue)] bg-[var(--color-accent-blue)] text-white"
+                  : "border-[var(--color-border-glass)] bg-[var(--color-surface-glass)] text-[var(--color-text-secondary)]"
+              }`}
+            >
+              <span
+                className={`flex h-4 w-7 items-center rounded-full p-0.5 transition-colors ${
+                  searchDescriptions ? "bg-white/30" : "bg-[var(--color-bg-soft)]"
+                }`}
+              >
+                <motion.span
+                  layout
+                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  className={`h-3 w-3 rounded-full ${
+                    searchDescriptions
+                      ? "ml-auto bg-white"
+                      : "bg-[var(--color-text-muted)]"
+                  }`}
+                />
+              </span>
+              Include descriptions
+            </button>
+          </div>
+
+          {filteredProjects.length === 0 && (
+            <p className="mb-6 text-sm text-[var(--color-text-muted)]">
+              No projects match “{projectSearch}”.
+            </p>
+          )}
+
+          {filteredProjects.length > 0 && visibleProjects.length === 0 && (
+            <p className="mb-6 text-sm text-[var(--color-text-muted)]">
+              No featured projects match “{projectSearch}” — click “See more”
+              below to include the rest.
+            </p>
+          )}
+
           <AnimatePresence mode="popLayout">
             <motion.div
               layout
               className="grid gap-5 md:grid-cols-2 xl:grid-cols-3"
             >
-              {filteredProjects.map((project) => (
+              {visibleProjects.map((project) => (
                 <motion.article
                   key={project.title}
                   layout
@@ -1136,6 +1278,7 @@ function App() {
                     <ProjectImage
                       slug={project.slug}
                       live={project.links.live}
+                      appStore={project.links.appStore}
                       fallback={project.image}
                       alt={project.title}
                       className="h-52 w-full object-cover transition duration-500 group-hover:scale-105"
@@ -1202,6 +1345,23 @@ function App() {
                             Figma
                           </a>
                         )}
+                        {project.links.download && (
+                          <a
+                            href={project.links.download}
+                            target="_blank"
+                            rel="noreferrer"
+                            aria-label="Download"
+                            className="hover:text-[var(--color-text-primary)]"
+                          >
+                            Download
+                          </a>
+                        )}
+                        {!Object.values(project.links).some(Boolean) &&
+                          project.internalNote && (
+                            <span className="normal-case tracking-normal text-[var(--color-text-muted)]">
+                              {project.internalNote}
+                            </span>
+                          )}
                       </div>
                     </div>
 
@@ -1229,6 +1389,20 @@ function App() {
               ))}
             </motion.div>
           </AnimatePresence>
+
+          {hiddenProjectCount > 0 && (
+            <div className="mt-6 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowAllProjects((current) => !current)}
+                className="text-xs font-medium text-[var(--color-text-muted)] underline-offset-4 transition-colors hover:text-[var(--color-text-primary)] hover:underline"
+              >
+                {showAllProjects
+                  ? "See less"
+                  : `See more (${hiddenProjectCount})`}
+              </button>
+            </div>
+          )}
         </section>
 
         <section id="skills" className="scroll-mt-28 py-12 md:py-14">
