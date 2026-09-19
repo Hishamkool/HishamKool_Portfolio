@@ -233,7 +233,7 @@ function App() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-[var(--color-bg)] text-[var(--color-text-primary)]">
+    <div className="page-gradient relative min-h-screen overflow-x-hidden text-(--color-text-primary)">
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute right-[-8%] top-[-10%] h-[32rem] w-[32rem] rounded-full bg-[radial-gradient(circle,_rgba(92,124,255,0.92)_0%,_rgba(92,124,255,0.42)_18%,_rgba(92,124,255,0.1)_38%,_rgba(92,124,255,0)_65%)] blur-[120px] opacity-95" />
         <div className="absolute bottom-[-10%] left-[-8%] h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(circle,_rgba(140,164,255,0.3)_0%,_rgba(120,145,255,0.18)_22%,_rgba(120,145,255,0)_60%)] blur-[110px] opacity-90" />

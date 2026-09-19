@@ -1,7 +1,6 @@
 @import "tailwindcss";
 
 :root {
-  --color-bg: #f3f5fb;
   --color-bg-soft: #ffffff;
   --color-surface: rgba(255, 255, 255, 0.72);
   --color-surface-glass: rgba(255, 255, 255, 0.5);
@@ -13,24 +12,25 @@
   --color-border-glass: rgba(255, 255, 255, 0.45);
   --shadow-glass: rgba(78, 103, 255, 0.18);
   --shadow-card: rgba(24, 27, 48, 0.1);
-  --page-glow: rgba(94, 127, 255, 0.42);
-  --page-glow-soft: rgba(137, 170, 255, 0.22);
-  --page-glow-warm: rgba(255, 167, 201, 0.18);
-  --page-base: #f5f6fb;
-  --page-gradient-1: rgba(131, 156, 255, 0.42);
-  --page-gradient-2: rgba(150, 210, 255, 0.2);
-  --page-gradient-3: rgba(255, 255, 255, 0.9);
+  --bg-gradient-from: #ffffff;
+  --bg-gradient-via: #eaf5ff;
+  --bg-gradient-to: #bfe3ff;
+  --bg-gradient: linear-gradient(
+    165deg,
+    var(--bg-gradient-from) 0%,
+    var(--bg-gradient-via) 48%,
+    var(--bg-gradient-to) 100%
+  );
   color-scheme: light;
   font-family: Inter, "Segoe UI", sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: var(--page-base);
+  background: var(--bg-gradient-from);
 }
 
 .dark {
-  --color-bg: #090b12;
   --color-bg-soft: #101521;
   --color-surface: rgba(17, 21, 30, 0.78);
   --color-surface-glass: rgba(14, 17, 25, 0.48);
@@ -42,51 +42,21 @@
   --color-border-glass: rgba(255, 255, 255, 0.12);
   --shadow-glass: rgba(0, 0, 0, 0.5);
   --shadow-card: rgba(0, 0, 0, 0.4);
-  --page-glow: rgba(84, 117, 255, 0.54);
-  --page-glow-soft: rgba(132, 160, 255, 0.24);
-  --page-glow-warm: rgba(255, 157, 194, 0.14);
-  --page-base: #07090d;
-  --page-gradient-1: rgba(62, 84, 255, 0.38);
-  --page-gradient-2: rgba(70, 124, 255, 0.2);
-  --page-gradient-3: rgba(20, 21, 28, 0.85);
+  --bg-gradient-from: #05060b;
+  --bg-gradient-via: #0a1630;
+  --bg-gradient-to: #15305c;
   color-scheme: dark;
 }
 
 html {
   scroll-behavior: smooth;
-  background: var(--page-base);
+  background: var(--bg-gradient-from);
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  background:
-    radial-gradient(
-      circle at 85% 15%,
-      var(--page-glow) 0%,
-      rgba(96, 128, 255, 0.34) 22%,
-      rgba(96, 128, 255, 0.08) 38%,
-      transparent 60%
-    ),
-    radial-gradient(
-      circle at 18% 82%,
-      var(--page-glow-soft) 0%,
-      rgba(91, 149, 255, 0.16) 18%,
-      rgba(91, 149, 255, 0.04) 32%,
-      transparent 52%
-    ),
-    radial-gradient(
-      circle at 72% 72%,
-      var(--page-glow-warm) 0%,
-      rgba(255, 166, 205, 0.12) 18%,
-      transparent 48%
-    ),
-    linear-gradient(
-      135deg,
-      var(--page-gradient-3) 0%,
-      var(--color-bg) 36%,
-      var(--page-gradient-1) 100%
-    );
+  background: var(--bg-gradient);
   background-attachment: fixed;
   color: var(--color-text-primary);
   font-family: Inter, "Segoe UI", sans-serif;
@@ -108,6 +78,11 @@ img {
 button,
 a {
   -webkit-tap-highlight-color: transparent;
+}
+
+.page-gradient {
+  background: var(--bg-gradient);
+  background-attachment: fixed;
 }
 
 .glass-panel {
