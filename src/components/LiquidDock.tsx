@@ -9,6 +9,7 @@ import {
 import { Moon, SunMedium } from "lucide-react";
 import {
   forwardRef,
+  useEffect,
   useLayoutEffect,
   useRef,
   useState,
@@ -121,6 +122,13 @@ export function LiquidDock({
   });
   const [hovering, setHovering] = useState(false);
   const [hoverTargetIndex, setHoverTargetIndex] = useState<number | null>(null);
+  const MIN_DROP_SIZE = 16;
+  const MAX_DROP_SIZE = 80;
+  const dropSize = useSpring(MIN_DROP_SIZE, {
+    stiffness: 180,
+    damping: 22,
+    mass: 0.8,
+  });
 
   const slotCount = navItems.length + 1;
 
@@ -197,19 +205,18 @@ export function LiquidDock({
     return `${blend}%`;
   });
 
-  const blobWidth = useTransform(dropX, (value) => {
-    const distance = Math.abs(value - (activeTargetCenter ?? 0.5));
-    const influence =
-      hoverTargetIndex === null ? 0 : Math.max(0, 1 - distance / 0.2);
-    return `${Math.max(44, activeTargetWidth * (0.8 + influence * 0.9))}px`;
-  });
+  const targetDropSize = Math.min(
+    MAX_DROP_SIZE,
+    Math.max(MIN_DROP_SIZE, activeTargetWidth * 0.9),
+  );
 
-  const blobHeight = useTransform(dropX, (value) => {
-    const distance = Math.abs(value - (activeTargetCenter ?? 0.5));
-    const influence =
-      hoverTargetIndex === null ? 0 : Math.max(0, 1 - distance / 0.2);
-    return `${Math.max(44, activeTargetHeight * (0.8 + influence * 0.9))}px`;
-  });
+  useEffect(() => {
+    const nextSize = hoverTargetIndex === null ? MIN_DROP_SIZE : targetDropSize;
+    dropSize.set(nextSize);
+  }, [dropSize, hoverTargetIndex, targetDropSize]);
+
+  const blobWidth = useTransform(dropSize, (size) => `${size}px`);
+  const blobHeight = useTransform(dropSize, (size) => `${size}px`);
 
   const { scrollY } = useScroll();
   const sheenPosition = useTransform(
