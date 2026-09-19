@@ -16,9 +16,12 @@ import {
   Users,
   Zap,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
+import { AnimatedCounter } from "./components/AnimatedCounter";
+import { LanguageTube } from "./components/LanguageTube";
 import { LiquidDock } from "./components/LiquidDock";
+import { ProjectImage } from "./components/ProjectImage";
 
 type NavItem = {
   id: string;
@@ -27,6 +30,7 @@ type NavItem = {
 };
 
 type Project = {
+  slug: string;
   title: string;
   category: string;
   description: string;
@@ -35,6 +39,9 @@ type Project = {
   links: {
     github?: string;
     live?: string;
+    appStore?: string;
+    playStore?: string;
+    figma?: string;
   };
 };
 
@@ -42,10 +49,14 @@ type TimelineNode = {
   id: string;
   type: string;
   title: string;
+  company: string;
   subtitle: string;
   dateRange: string;
+  start: string;
+  end: string | null;
   bullets: string[];
   projects?: string;
+  certificate?: string;
   icon: typeof BriefcaseBusiness;
 };
 
@@ -60,6 +71,7 @@ type Certification = {
   org: string;
   dateRange: string;
   note?: string;
+  certificateUrl?: string;
   bullets?: string[];
 };
 
@@ -73,6 +85,7 @@ type EducationEntry = {
 type LanguageEntry = {
   name: string;
   level: string;
+  percent: number;
 };
 
 const navItems: NavItem[] = [
@@ -87,54 +100,30 @@ const navItems: NavItem[] = [
 
 const timelineNodes: TimelineNode[] = [
   {
-    id: "grapes",
+    id: "leaderit",
     type: "Full-time",
-    title: "Junior Flutter Developer",
-    subtitle: "Grapes IDMR — Thrissur",
-    dateRange: "May 2024 — Mar 2025",
+    title: "Associate Software Developer",
+    company: "LeaderIT",
+    subtitle: "LeaderIT — Trivandrum",
+    dateRange: "May 2026 — Present",
+    start: "2026-05-01",
+    end: null,
     bullets: [
-      "Built and maintained cross-platform mobile apps using Flutter across healthcare, employee management, and smart control systems.",
-      "Designed responsive UIs using Figma and Justinmind, implemented in Flutter based on MVC and MVVM architectures; migrated apps from GetX to Provider for improved maintainability.",
-      "Integrated REST APIs, real-time updates, and Firebase Cloud Messaging (FCM).",
-      "Used Git for version control and collaboration.",
+      "Working on Automax, a workflow automation platform for managing business operations, user access, and organizational structure with enterprise-grade security.",
+      "Building and maintaining responsive front-end features using React.js, focused on clean, intuitive interfaces for complex operational workflows.",
+      "Expanding into cross-platform mobile development with React Native, applying core React concepts to build and test mobile-friendly features alongside the web application.",
     ],
-    projects: "CSSD, DiaLog, Grapes Office Log, Smart Device Management, MyHRM QR, NameBoard, BSA",
     icon: BriefcaseBusiness,
-  },
-  {
-    id: "famlaika",
-    type: "Part-time",
-    title: "Flutter Developer (Part-time)",
-    subtitle: "Famlaika — Remote",
-    dateRange: "Apr 2025 — Jun 2025",
-    bullets: [
-      "Improved code maintainability by separating UI from business logic using Provider and clean architectural practices.",
-      "Supported development workflows by introducing tools and practices that improved debugging and development efficiency.",
-      "Contributed to the development and enhancement of the Family Tree module, ensuring scalable data handling and intuitive UI behavior.",
-    ],
-    icon: Zap,
-  },
-  {
-    id: "vonnue",
-    type: "Internship",
-    title: "Full Stack Developer Intern",
-    subtitle: "Vonnue — Sultan Bathery",
-    dateRange: "Jul 2025 — Mar 2026",
-    bullets: [
-      "Engaged in a comprehensive 6-month training and internship program centered on developing scalable and efficient web applications.",
-      "Gained hands-on experience with React.js, Tailwind CSS, JavaScript, HTML, and Firestore through real-world full stack development projects.",
-      "Designed and implemented dynamic, responsive user interfaces with a strong emphasis on clean, intuitive UI/UX.",
-    ],
-    projects:
-      "Recipedia, Daily Logs Calculator, Meal Cast, Dice Game, Amoled Clock, Doordash, AirBnb, Biosynthesis, Myntra (mobile view)",
-    icon: GraduationCap,
   },
   {
     id: "benjamin",
     type: "Freelance",
     title: "Freelance Web Developer",
+    company: "Benjamin Portfolio Website",
     subtitle: "Benjamin Portfolio Website — Remote",
     dateRange: "May 2026 — Jul 2026",
+    start: "2026-05-01",
+    end: "2026-07-31",
     bullets: [
       "Designed and developed a personal portfolio website for a freelance client (a designer and video editor), translating a custom Figma UI/UX design into a fully responsive, production site — benjamincs.com.",
       "Built a parallax scrolling homepage along with a separate map-style interactive homepage, with distinct layouts and interactions for desktop and mobile.",
@@ -146,22 +135,80 @@ const timelineNodes: TimelineNode[] = [
     icon: Sparkles,
   },
   {
-    id: "leaderit",
-    type: "Full-time",
-    title: "Associate Software Developer",
-    subtitle: "LeaderIT — Trivandrum",
-    dateRange: "May 2026 — Present",
+    id: "vonnue",
+    type: "Internship",
+    title: "Full Stack Developer Intern",
+    company: "Vonnue",
+    subtitle: "Vonnue — Sultan Bathery",
+    dateRange: "Jul 2025 — Mar 2026",
+    start: "2025-07-01",
+    end: "2026-03-31",
     bullets: [
-      "Working on Automax, a workflow automation platform for managing business operations, user access, and organizational structure with enterprise-grade security.",
-      "Building and maintaining responsive front-end features using React.js, focused on clean, intuitive interfaces for complex operational workflows.",
-      "Expanding into cross-platform mobile development with React Native, applying core React concepts to build and test mobile-friendly features alongside the web application.",
+      "Engaged in a comprehensive 6-month training and internship program centered on developing scalable and efficient web applications.",
+      "Gained hands-on experience with React.js, Tailwind CSS, JavaScript, HTML, and Firestore through real-world full stack development projects.",
+      "Designed and implemented dynamic, responsive user interfaces with a strong emphasis on clean, intuitive UI/UX.",
     ],
+    projects:
+      "Recipedia, Daily Logs Calculator, Meal Cast, Dice Game, Amoled Clock, Doordash, AirBnb, Biosynthesis, Myntra (mobile view)",
+    icon: GraduationCap,
+  },
+  {
+    id: "famlaika",
+    type: "Part-time",
+    title: "Flutter Developer (Part-time)",
+    company: "Famlaika",
+    subtitle: "Famlaika — Remote",
+    dateRange: "Apr 2025 — Jun 2025",
+    start: "2025-04-01",
+    end: "2025-06-30",
+    bullets: [
+      "Improved code maintainability by separating UI from business logic using Provider and clean architectural practices.",
+      "Supported development workflows by introducing tools and practices that improved debugging and development efficiency.",
+      "Contributed to the development and enhancement of the Family Tree module, ensuring scalable data handling and intuitive UI behavior.",
+    ],
+    icon: Zap,
+  },
+  {
+    id: "grapes",
+    type: "Full-time",
+    title: "Junior Flutter Developer",
+    company: "Grapes IDMR",
+    subtitle: "Grapes IDMR — Thrissur",
+    dateRange: "May 2024 — Mar 2025",
+    start: "2024-05-01",
+    end: "2025-03-31",
+    bullets: [
+      "Built and maintained cross-platform mobile apps using Flutter across healthcare, employee management, and smart control systems.",
+      "Designed responsive UIs using Figma and Justinmind, implemented in Flutter based on MVC and MVVM architectures; migrated apps from GetX to Provider for improved maintainability.",
+      "Integrated REST APIs, real-time updates, and Firebase Cloud Messaging (FCM).",
+      "Used Git for version control and collaboration.",
+    ],
+    projects: "CSSD, DiaLog, Grapes Office Log, Smart Device Management, MyHRM QR, NameBoard, BSA",
     icon: BriefcaseBusiness,
+  },
+  {
+    id: "cabin4",
+    type: "Internship",
+    title: "Web Developer Intern",
+    company: "Cabin4",
+    subtitle: "Cabin4 — Malappuram",
+    dateRange: "Aug 2019 — Feb 2020",
+    start: "2019-08-01",
+    end: "2020-02-29",
+    bullets: [
+      "Gained hands-on experience in HTML, CSS, JavaScript, and basic Python programming through guided projects.",
+      "Built interactive web apps including a Password Generator and a static Houseme website, among others.",
+      "Practiced coding fundamentals by creating logic-based Python pattern programs, improving problem-solving and code structuring skills.",
+    ],
+    projects: "Password Generator, Houseme",
+    certificate: "verify.cabin4.pro/v8uj",
+    icon: GraduationCap,
   },
 ];
 
 const projects: Project[] = [
   {
+    slug: "benjamin-portfolio",
     title: "Benjamin Portfolio",
     category: "Freelance",
     description:
@@ -172,9 +219,11 @@ const projects: Project[] = [
     links: {
       github: "https://github.com/Hishamkool/portfolio_benjamin",
       live: "https://benjamincs.com",
+      figma: "https://www.figma.com/design/4SXzDdrTzOgUe91RpnbBtS/portfolio-Benjamin",
     },
   },
   {
+    slug: "automax",
     title: "Automax",
     category: "React",
     description:
@@ -185,6 +234,7 @@ const projects: Project[] = [
     links: {},
   },
   {
+    slug: "recipedia",
     title: "Recipedia",
     category: "React",
     description:
@@ -192,9 +242,12 @@ const projects: Project[] = [
     stack: ["React", "Tailwind CSS", "JavaScript"],
     image:
       "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=900&q=80",
-    links: {},
+    links: {
+      live: "https://recipedia-five.vercel.app/",
+    },
   },
   {
+    slug: "daily-logs-calculator",
     title: "Daily Logs Calculator",
     category: "React",
     description:
@@ -202,9 +255,12 @@ const projects: Project[] = [
     stack: ["React", "Tailwind CSS", "JavaScript"],
     image:
       "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80",
-    links: {},
+    links: {
+      live: "https://vonnuedailylogs.vercel.app/",
+    },
   },
   {
+    slug: "meal-cast",
     title: "Meal Cast",
     category: "React",
     description:
@@ -212,9 +268,12 @@ const projects: Project[] = [
     stack: ["React", "Tailwind CSS", "JavaScript"],
     image:
       "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80",
-    links: {},
+    links: {
+      github: "https://github.com/Hishamkool/MealCast",
+    },
   },
   {
+    slug: "dice-game",
     title: "Dice Game",
     category: "React",
     description:
@@ -222,9 +281,12 @@ const projects: Project[] = [
     stack: ["React", "JavaScript"],
     image:
       "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=900&q=80",
-    links: {},
+    links: {
+      live: "https://dice-game-hisham.vercel.app/",
+    },
   },
   {
+    slug: "amoled-clock",
     title: "Amoled Clock",
     category: "React",
     description:
@@ -232,9 +294,12 @@ const projects: Project[] = [
     stack: ["React", "Tailwind CSS"],
     image:
       "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80",
-    links: {},
+    links: {
+      live: "https://amoled-clock-hisham.vercel.app/",
+    },
   },
   {
+    slug: "doordash-clone",
     title: "Doordash (Clone)",
     category: "React",
     description:
@@ -242,9 +307,12 @@ const projects: Project[] = [
     stack: ["React", "Tailwind CSS", "JavaScript"],
     image:
       "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80",
-    links: {},
+    links: {
+      live: "https://doordash-roan.vercel.app/",
+    },
   },
   {
+    slug: "airbnb-clone",
     title: "AirBnb (Clone)",
     category: "React",
     description:
@@ -252,9 +320,12 @@ const projects: Project[] = [
     stack: ["React", "Tailwind CSS", "JavaScript"],
     image:
       "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=900&q=80",
-    links: {},
+    links: {
+      live: "https://airbnb-clone-hisham.vercel.app/",
+    },
   },
   {
+    slug: "biosynthesis",
     title: "Biosynthesis",
     category: "React",
     description:
@@ -262,9 +333,12 @@ const projects: Project[] = [
     stack: ["React", "Tailwind CSS", "Firestore"],
     image:
       "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80",
-    links: {},
+    links: {
+      live: "https://hishamkool.github.io/Progbiz-Biosynthesis/",
+    },
   },
   {
+    slug: "cssd",
     title: "CSSD",
     category: "Flutter",
     description:
@@ -272,9 +346,15 @@ const projects: Project[] = [
     stack: ["Flutter", "Dart", "Provider", "Firebase"],
     image:
       "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=900&q=80",
-    links: {},
+    links: {
+      github: "https://github.com/Hishamkool/CSSD-readme",
+      appStore: "https://apps.apple.com/in/app/cssd-grapes/id6759464211",
+      playStore:
+        "https://play.google.com/store/apps/details?id=com.grapeshms.cssdapp&pcampaignid=web_share",
+    },
   },
   {
+    slug: "dialog",
     title: "DiaLog",
     category: "Flutter",
     description:
@@ -282,9 +362,14 @@ const projects: Project[] = [
     stack: ["Flutter", "Dart", "Provider", "Firebase"],
     image:
       "https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=900&q=80",
-    links: {},
+    links: {
+      appStore: "https://apps.apple.com/in/app/dia-log/id6743195893",
+      playStore:
+        "https://play.google.com/store/apps/details?id=com.grapeshms.dialysis&pcampaignid=web_share",
+    },
   },
   {
+    slug: "grapes-office-log",
     title: "Grapes Office Log",
     category: "Flutter",
     description:
@@ -295,6 +380,7 @@ const projects: Project[] = [
     links: {},
   },
   {
+    slug: "smart-device-management",
     title: "Smart Device Management",
     category: "Flutter",
     description:
@@ -305,6 +391,7 @@ const projects: Project[] = [
     links: {},
   },
   {
+    slug: "myhrm-qr",
     title: "MyHRM QR",
     category: "Flutter",
     description:
@@ -315,6 +402,7 @@ const projects: Project[] = [
     links: {},
   },
   {
+    slug: "nameboard",
     title: "NameBoard",
     category: "Flutter",
     description:
@@ -325,14 +413,110 @@ const projects: Project[] = [
     links: {},
   },
   {
+    slug: "bsa",
     title: "BSA",
     category: "Flutter",
     description:
-      "A streamlined workflow app for internal operations and reporting, built as part of the Grapes IDMR suite.",
+      "Bedside Assistant — a vital-history section within Grapes' bedside assistant suite, built for patient care workflows.",
     stack: ["Flutter", "Dart", "MVVM"],
     image:
       "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=900&q=80",
-    links: {},
+    links: {
+      appStore: "https://apps.apple.com/in/app/grapes-bsa/id6471225474",
+      playStore:
+        "https://play.google.com/store/apps/details?id=com.grapeshms.bedsideassistant.pro&pcampaignid=web_share",
+    },
+  },
+  {
+    slug: "password-generator",
+    title: "Password Generator",
+    category: "JavaScript",
+    description:
+      "A password generator web app that creates strong random passwords, built with vanilla JavaScript during the Cabin4 internship to practice DOM manipulation and logic-building.",
+    stack: ["HTML", "CSS", "JavaScript"],
+    image:
+      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80",
+    links: {
+      github: "https://github.com/Hishamkool/random-password-generator",
+    },
+  },
+  {
+    slug: "houseme",
+    title: "Houseme",
+    category: "JavaScript",
+    description:
+      "A static website built during the Cabin4 internship to practice responsive front-end layout and structure using HTML, CSS, and JavaScript.",
+    stack: ["HTML", "CSS", "JavaScript"],
+    image:
+      "https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=900&q=80",
+    links: {
+      github: "https://github.com/Hishamkool/Houseme",
+    },
+  },
+  {
+    slug: "news-app",
+    title: "News App",
+    category: "Flutter",
+    description:
+      "A news reader app fetching live articles from a public API, built while training in Flutter and REST API integration.",
+    stack: ["Flutter", "Dart", "REST API"],
+    image:
+      "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=900&q=80",
+    links: {
+      github: "https://github.com/Hishamkool/newsApp_api",
+    },
+  },
+  {
+    slug: "movie-app",
+    title: "Movie App",
+    category: "Flutter",
+    description:
+      "A movie browsing app for discovering films and viewing details, built with Flutter during Luminar Technolab training.",
+    stack: ["Flutter", "Dart"],
+    image:
+      "https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=900&q=80",
+    links: {
+      github: "https://github.com/Hishamkool/movieui_flutter",
+    },
+  },
+  {
+    slug: "hotel-booking-app",
+    title: "Hotel Booking App",
+    category: "Flutter",
+    description:
+      "A hotel booking UI for browsing rooms and making reservations, built with Flutter during Luminar Technolab training.",
+    stack: ["Flutter", "Dart"],
+    image:
+      "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=900&q=80",
+    links: {
+      github: "https://github.com/Hishamkool/hotel_app_flutter",
+    },
+  },
+  {
+    slug: "exotic-car-app",
+    title: "Exotic Car App",
+    category: "Flutter",
+    description:
+      "An exotic car showcase app with a rich, image-driven UI, built with Flutter during Luminar Technolab training.",
+    stack: ["Flutter", "Dart"],
+    image:
+      "https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=900&q=80",
+    links: {
+      github: "https://github.com/Hishamkool/Car_App_Flutter",
+    },
+  },
+  {
+    slug: "instagram-clone",
+    title: "Instagram Clone",
+    category: "Flutter",
+    description:
+      "An Instagram UI clone practicing feed layouts, stories, and profile screens in Flutter during Luminar Technolab training.",
+    stack: ["Flutter", "Dart"],
+    image:
+      "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=900&q=80",
+    links: {
+      github: "https://github.com/Hishamkool/instagramuiClone_flutter",
+    },
   },
 ];
 
@@ -390,7 +574,8 @@ const certifications: Certification[] = [
     title: "Android Development Expert (Flutter and Java) Certification",
     org: "Luminar Technolab",
     dateRange: "Aug 2023",
-    note: "Certificate: nactetindia.org | Muhammed Hisham, 34152",
+    note: "Verify with: Muhammed Hisham, 34152",
+    certificateUrl: "https://www.nactetindia.org/search.php",
   },
   {
     title: "Flutter Development Training",
@@ -425,13 +610,23 @@ const education: EducationEntry[] = [
 ];
 
 const languages: LanguageEntry[] = [
-  { name: "English", level: "Full Professional Proficiency" },
-  { name: "Hindi", level: "Full Professional Proficiency" },
-  { name: "Tamil", level: "Native / Bilingual Proficiency" },
-  { name: "Malayalam", level: "Native Proficiency" },
+  { name: "English", level: "Full Professional Proficiency", percent: 95 },
+  { name: "Hindi", level: "Full Professional Proficiency", percent: 95 },
+  { name: "Tamil", level: "Native / Bilingual Proficiency", percent: 80 },
+  { name: "Malayalam", level: "Native Proficiency", percent: 100 },
 ];
 
 const easing = [0.22, 1, 0.36, 1] as const;
+
+const MS_PER_YEAR = 1000 * 60 * 60 * 24 * 365.25;
+
+function getYearsOfExperience(nodes: TimelineNode[]): number {
+  const earliestStart = Math.min(
+    ...nodes.map((node) => new Date(node.start).getTime()),
+  );
+  const years = (Date.now() - earliestStart) / MS_PER_YEAR;
+  return Math.max(0, Math.round(years * 10) / 10);
+}
 
 function GlassPanel({
   children,
@@ -453,9 +648,30 @@ function App() {
   const [activeSection, setActiveSection] = useState("home");
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [projectFilter, setProjectFilter] = useState("All");
+  const [scrollDirection, setScrollDirection] = useState<"up" | "down">(
+    "down",
+  );
+  const lastScrollYRef = useRef(0);
   const showDockHoverLabels = true;
 
-  const filters = useMemo(() => ["All", "React", "Flutter", "Freelance"], []);
+  const yearsOfExperience = useMemo(
+    () => getYearsOfExperience(timelineNodes),
+    [],
+  );
+  const appsShipped = projects.length;
+  const flutterAppsShipped = useMemo(
+    () => projects.filter((project) => project.category === "Flutter").length,
+    [],
+  );
+  const companiesCount = useMemo(
+    () => new Set(timelineNodes.map((node) => node.company)).size,
+    [],
+  );
+
+  const filters = useMemo(
+    () => ["All", "React", "Flutter", "JavaScript", "Freelance"],
+    [],
+  );
 
   const filteredProjects = useMemo(() => {
     if (projectFilter === "All") return projects;
@@ -484,9 +700,18 @@ function App() {
   useEffect(() => {
     const sectionIds = navItems.map((item) => item.id);
     const SCROLL_OFFSET = 160;
+    const DIRECTION_THRESHOLD = 4;
+    lastScrollYRef.current = window.scrollY;
 
     const updateActiveSection = () => {
-      const scrollPosition = window.scrollY + SCROLL_OFFSET;
+      const currentScrollY = window.scrollY;
+      const delta = currentScrollY - lastScrollYRef.current;
+      if (Math.abs(delta) > DIRECTION_THRESHOLD) {
+        setScrollDirection(delta > 0 ? "down" : "up");
+        lastScrollYRef.current = currentScrollY;
+      }
+
+      const scrollPosition = currentScrollY + SCROLL_OFFSET;
       let current = sectionIds[0];
 
       for (const id of sectionIds) {
@@ -497,7 +722,7 @@ function App() {
       }
 
       const atBottom =
-        window.innerHeight + window.scrollY >=
+        window.innerHeight + currentScrollY >=
         document.documentElement.scrollHeight - 2;
       if (atBottom) {
         current = sectionIds[sectionIds.length - 1];
@@ -650,7 +875,12 @@ function App() {
                       <div className="rounded-2xl border border-[var(--color-border-glass)] bg-[var(--color-surface)]/60 p-3">
                         <p className="text-[var(--color-text-muted)]">Years</p>
                         <p className="mt-1 text-xl font-semibold text-[var(--color-text-primary)]">
-                          2+
+                          <AnimatedCounter
+                            value={yearsOfExperience}
+                            decimals={1}
+                            suffix="+"
+                            once={false}
+                          />
                         </p>
                       </div>
                       <div className="rounded-2xl border border-[var(--color-border-glass)] bg-[var(--color-surface)]/60 p-3">
@@ -658,7 +888,11 @@ function App() {
                           Apps Shipped
                         </p>
                         <p className="mt-1 text-xl font-semibold text-[var(--color-text-primary)]">
-                          6+
+                          <AnimatedCounter
+                            value={appsShipped}
+                            suffix="+"
+                            once={false}
+                          />
                         </p>
                       </div>
                     </div>
@@ -681,34 +915,78 @@ function App() {
 
           <GlassPanel className="p-6 md:p-8">
             <p className="max-w-3xl text-lg leading-8 text-[var(--color-text-secondary)]">
-              Frontend Developer with 2+ years of experience building
-              responsive web and mobile applications, currently focused on
-              React.js and expanding into React Native. Delivered 6+
-              cross-platform mobile apps using Flutter across healthcare,
-              workforce, and smart system domains, improving UI responsiveness
-              by up to 60% through adaptive layouts for mobile, tablet, and
-              kiosk screens. Skilled in building clean, maintainable
-              interfaces using React.js and Tailwind CSS, with a strong
-              foundation in state management (Provider), REST API
-              integration, and real-time features via Firebase. Currently
-              contributing to Automax, an enterprise workflow automation
-              platform, while continuing to grow expertise across the React
-              ecosystem.
+              Frontend Developer with{" "}
+              <AnimatedCounter
+                value={yearsOfExperience}
+                decimals={1}
+                suffix="+"
+                once={false}
+              />{" "}
+              years of experience building responsive web and mobile
+              applications, currently focused on React.js and expanding into
+              React Native. Delivered{" "}
+              <AnimatedCounter
+                value={flutterAppsShipped}
+                suffix="+"
+                once={false}
+              />{" "}
+              cross-platform mobile apps using Flutter across healthcare, workforce, and
+              smart system domains, improving UI responsiveness by up to 60%
+              through adaptive layouts for mobile, tablet, and kiosk screens.
+              Skilled in building clean, maintainable interfaces using
+              React.js and Tailwind CSS, with a strong foundation in state
+              management (Provider), REST API integration, and real-time
+              features via Firebase. Currently contributing to Automax, an
+              enterprise workflow automation platform, while continuing to
+              grow expertise across the React ecosystem.
             </p>
 
             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
-                { label: "Years Experience", value: "2+" },
-                { label: "Apps Shipped", value: "6+" },
-                { label: "UI Responsiveness Gain", value: "60%" },
-                { label: "Companies & Clients", value: "5" },
+                {
+                  label: "Years Experience",
+                  node: (
+                    <AnimatedCounter
+                      value={yearsOfExperience}
+                      decimals={1}
+                      suffix="+"
+                      once={false}
+                    />
+                  ),
+                },
+                {
+                  label: "Apps Shipped",
+                  node: (
+                    <AnimatedCounter
+                      value={appsShipped}
+                      suffix="+"
+                      once={false}
+                    />
+                  ),
+                },
+                {
+                  label: "UI Responsiveness Gain",
+                  node: (
+                    <AnimatedCounter value={60} suffix="%" once={false} />
+                  ),
+                },
+                {
+                  label: "Companies & Clients",
+                  node: (
+                    <AnimatedCounter
+                      value={companiesCount}
+                      suffix="+"
+                      once={false}
+                    />
+                  ),
+                },
               ].map((stat) => (
                 <div
                   key={stat.label}
                   className="rounded-2xl border border-[var(--color-border-glass)] bg-[var(--color-surface)]/60 p-3"
                 >
                   <p className="text-xl font-semibold text-[var(--color-text-primary)]">
-                    {stat.value}
+                    {stat.node}
                   </p>
                   <p className="mt-1 text-xs uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
                     {stat.label}
@@ -735,10 +1013,17 @@ function App() {
             {timelineNodes.map((node, index) => (
               <motion.article
                 key={node.id}
-                initial={{ opacity: 0, x: -18 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.5, ease: easing, delay: index * 0.1 }}
+                initial={{
+                  opacity: 0,
+                  y: scrollDirection === "down" ? 56 : -56,
+                }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: false, amount: 0.3 }}
+                transition={{
+                  duration: 0.5,
+                  ease: easing,
+                  delay: Math.min(index, 3) * 0.05,
+                }}
                 className="relative pl-12"
               >
                 <div className="absolute left-0 top-4 flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-border-glass)] bg-[var(--color-surface)] text-[var(--color-accent-blue)] shadow-[0_6px_20px_0_var(--shadow-card)]">
@@ -774,15 +1059,25 @@ function App() {
                       {node.projects}
                     </p>
                   )}
+                  {node.certificate && (
+                    <p className="mt-2 text-sm text-[var(--color-text-muted)]">
+                      <span className="uppercase tracking-[0.14em]">
+                        Certificate:
+                      </span>{" "}
+                      <a
+                        href={`https://${node.certificate}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[var(--color-accent-blue)] hover:underline"
+                      >
+                        {node.certificate}
+                      </a>
+                    </p>
+                  )}
                 </GlassPanel>
               </motion.article>
             ))}
           </div>
-
-          <p className="mt-8 pl-12 text-sm text-[var(--color-text-muted)]">
-            Early Experience: Cabin4 — Aug 2019 – Feb 2020 (college-level
-            internship)
-          </p>
         </section>
 
         <section id="projects" className="scroll-mt-28 py-12 md:py-14">
@@ -838,19 +1133,31 @@ function App() {
                   className="group overflow-hidden rounded-[24px] border border-[var(--color-border-glass)] bg-[var(--color-surface)]/70 shadow-[0_12px_30px_0_var(--shadow-card)]"
                 >
                   <div className="overflow-hidden">
-                    <img
-                      src={project.image}
+                    <ProjectImage
+                      slug={project.slug}
+                      live={project.links.live}
+                      fallback={project.image}
                       alt={project.title}
-                      loading="lazy"
                       className="h-52 w-full object-cover transition duration-500 group-hover:scale-105"
                     />
                   </div>
                   <div className="space-y-4 p-5">
-                    <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-start justify-between gap-3">
                       <span className="rounded-full border border-[var(--color-border-glass)] bg-[var(--color-surface-glass)] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-[var(--color-text-secondary)]">
                         {project.category}
                       </span>
-                      <div className="flex items-center gap-3 text-[var(--color-text-muted)]">
+                      <div className="flex flex-wrap justify-end gap-x-3 gap-y-1 text-[11px] font-medium uppercase tracking-[0.1em] text-[var(--color-text-muted)]">
+                        {project.links.live && (
+                          <a
+                            href={project.links.live}
+                            target="_blank"
+                            rel="noreferrer"
+                            aria-label="Live"
+                            className="hover:text-[var(--color-text-primary)]"
+                          >
+                            Live
+                          </a>
+                        )}
                         {project.links.github && (
                           <a
                             href={project.links.github}
@@ -862,15 +1169,37 @@ function App() {
                             Code
                           </a>
                         )}
-                        {project.links.live && (
+                        {project.links.appStore && (
                           <a
-                            href={project.links.live}
+                            href={project.links.appStore}
                             target="_blank"
                             rel="noreferrer"
-                            aria-label="Live"
+                            aria-label="App Store"
                             className="hover:text-[var(--color-text-primary)]"
                           >
-                            Live
+                            App Store
+                          </a>
+                        )}
+                        {project.links.playStore && (
+                          <a
+                            href={project.links.playStore}
+                            target="_blank"
+                            rel="noreferrer"
+                            aria-label="Play Store"
+                            className="hover:text-[var(--color-text-primary)]"
+                          >
+                            Play Store
+                          </a>
+                        )}
+                        {project.links.figma && (
+                          <a
+                            href={project.links.figma}
+                            target="_blank"
+                            rel="noreferrer"
+                            aria-label="Figma"
+                            className="hover:text-[var(--color-text-primary)]"
+                          >
+                            Figma
                           </a>
                         )}
                       </div>
@@ -985,8 +1314,23 @@ function App() {
                         ))}
                       </ul>
                     )}
-                    {cert.note && (
+                    {cert.certificateUrl && (
                       <p className="mt-2 text-xs text-[var(--color-text-muted)]">
+                        <span className="uppercase tracking-[0.14em]">
+                          Certificate:
+                        </span>{" "}
+                        <a
+                          href={cert.certificateUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-[var(--color-accent-blue)] hover:underline"
+                        >
+                          {cert.certificateUrl.replace(/^https?:\/\//, "")}
+                        </a>
+                      </p>
+                    )}
+                    {cert.note && (
+                      <p className="mt-1 text-xs text-[var(--color-text-muted)]">
                         {cert.note}
                       </p>
                     )}
@@ -1037,14 +1381,26 @@ function App() {
                 {languages.map((language) => (
                   <div
                     key={language.name}
-                    className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--color-border-glass)] bg-[var(--color-surface)]/60 px-3 py-2.5"
+                    className="flex items-center gap-4 rounded-2xl border border-[var(--color-border-glass)] bg-[var(--color-surface)]/60 px-3 py-2.5"
                   >
-                    <span className="font-medium text-[var(--color-text-primary)]">
-                      {language.name}
-                    </span>
-                    <span className="text-right text-xs text-[var(--color-text-secondary)]">
-                      {language.level}
-                    </span>
+                    <LanguageTube percent={language.percent} />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="font-medium text-[var(--color-text-primary)]">
+                          {language.name}
+                        </span>
+                        <span className="text-xs font-medium text-[var(--color-accent-blue)]">
+                          <AnimatedCounter
+                            value={language.percent}
+                            suffix="%"
+                            once={false}
+                          />
+                        </span>
+                      </div>
+                      <p className="text-right text-xs text-[var(--color-text-secondary)]">
+                        {language.level}
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>
