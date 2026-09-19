@@ -42,10 +42,10 @@ type SkillGroup = {
 
 const navItems: NavItem[] = [
   { id: "home", label: "Home", icon: House },
-  { id: "road", label: "Road", icon: BriefcaseBusiness },
+  { id: "road", label: "Timeline", icon: BriefcaseBusiness },
   { id: "projects", label: "Projects", icon: FolderKanban },
   { id: "skills", label: "Skills", icon: Sparkles },
-  { id: "contact", label: "Contact", icon: Mail },
+  { id: "contact", label: "Contact Me", icon: Mail },
 ];
 
 const timelineNodes = [
@@ -173,6 +173,7 @@ function App() {
   const [activeSection, setActiveSection] = useState("home");
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [projectFilter, setProjectFilter] = useState("All");
+  const showDockHoverLabels = true;
 
   const filters = useMemo(
     () => ["All", "React", "Flutter", "Mobile", "Design"],
@@ -633,6 +634,7 @@ function App() {
           onToggleTheme={() =>
             setTheme((current) => (current === "light" ? "dark" : "light"))
           }
+          showHoverLabels={showDockHoverLabels}
         />
       </div>
     </div>

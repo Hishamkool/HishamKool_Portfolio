@@ -29,6 +29,7 @@ type LiquidDockProps = {
   onNavigate: (id: string) => void;
   theme: "light" | "dark";
   onToggleTheme: () => void;
+  showHoverLabels?: boolean;
 };
 
 // Magnification tuning: how many "icon slots" the cursor's influence spans,
@@ -64,6 +65,7 @@ const DockIcon = forwardRef<
     mouseFraction: MotionValue<number>;
     isActive?: boolean;
     onClick: () => void;
+    showHoverLabels?: boolean;
   }
 >(function DockIcon(
   {
@@ -74,6 +76,7 @@ const DockIcon = forwardRef<
     mouseFraction,
     isActive,
     onClick,
+    showHoverLabels = true,
   },
   ref,
 ) {
@@ -85,8 +88,13 @@ const DockIcon = forwardRef<
       type="button"
       onClick={onClick}
       aria-label={label}
-      className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full text-[var(--color-text-primary)] md:h-14 md:w-14 lg:h-20 lg:w-20"
+      className="group relative z-10 flex h-12 w-12 items-center justify-center rounded-full text-[var(--color-text-primary)] md:h-14 md:w-14 lg:h-20 lg:w-20"
     >
+      {showHoverLabels && (
+        <span className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-[var(--color-border-glass)] bg-[var(--color-surface-glass)] px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] text-[var(--color-text-primary)] uppercase opacity-0 shadow-[0_8px_24px_rgba(15,23,42,0.18)] transition-all duration-200 ease-out group-hover:translate-y-0 group-hover:opacity-100 group-hover:scale-100 group-focus-visible:opacity-100 md:-top-11 md:text-[11px]">
+          {label}
+        </span>
+      )}
       {isActive && (
         <motion.span
           layoutId="dock-indicator"
@@ -110,6 +118,7 @@ export function LiquidDock({
   onNavigate,
   theme,
   onToggleTheme,
+  showHoverLabels = true,
 }: LiquidDockProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -218,10 +227,6 @@ export function LiquidDock({
     itemRefs.current[targetIndex] && itemRefs.current[targetIndex]!.offsetWidth
       ? itemRefs.current[targetIndex]!.offsetWidth
       : 56;
-  const activeTargetHeight =
-    itemRefs.current[targetIndex] && itemRefs.current[targetIndex]!.offsetHeight
-      ? itemRefs.current[targetIndex]!.offsetHeight
-      : 56;
 
   const blobX = useTransform(dropX, (value) => {
     const targetPercent = (activeTargetCenter ?? 0.5) * 100;
@@ -248,7 +253,7 @@ export function LiquidDock({
     scrollY,
     (value) => `${((value * 0.12) % 260) - 60}% 50%`,
   );
-  const dropLeft = useTransform(dropX, (v) => `${v * 100}%`);
+
   const dropTrailLeft = useTransform(dropTrail, (v) => `${v * 100}%`);
 
   return (
@@ -329,6 +334,7 @@ export function LiquidDock({
           mouseFraction={mouseFraction}
           isActive={item.id === activeSection}
           onClick={() => onNavigate(item.id)}
+          showHoverLabels={showHoverLabels}
         />
       ))}
 
@@ -344,6 +350,7 @@ export function LiquidDock({
         slotCount={slotCount}
         mouseFraction={mouseFraction}
         onClick={onToggleTheme}
+        showHoverLabels={showHoverLabels}
       />
     </div>
   );
