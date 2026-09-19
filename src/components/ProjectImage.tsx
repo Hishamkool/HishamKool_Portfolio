@@ -63,7 +63,10 @@ export function ProjectImage({
   const [failed, setFailed] = useState<Set<string>>(new Set());
 
   const candidates: Candidate[] = [
-    { src: `/projects/${slug}/project_thumb.jpg`, kind: "photo" },
+    {
+      src: `${import.meta.env.BASE_URL}projects/${slug}/project_thumb.jpg`,
+      kind: "photo",
+    },
     ...(live ? [{ src: getScreenshotUrl(live), kind: "photo" as const }] : []),
     ...(appStoreIcon ? [{ src: appStoreIcon, kind: "icon" as const }] : []),
     { src: fallback, kind: "photo" },
