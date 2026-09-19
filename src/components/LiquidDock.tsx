@@ -33,8 +33,7 @@ type LiquidDockProps = {
 // Magnification tuning: how many "icon slots" the cursor's influence spans,
 // how much an icon scales up at the cursor's exact center, and how far it lifts.
 const MAGNIFY_RADIUS = 1.35;
-const MAGNIFY_SCALE = 0.55;
-const MAGNIFY_LIFT = 11;
+const MAGNIFY_SCALE = 0.48;
 const NO_HOVER = -10;
 
 function useMagnify(
@@ -48,16 +47,9 @@ function useMagnify(
     const falloff = Math.exp(-((distance / (MAGNIFY_RADIUS * 0.55)) ** 2));
     return 1 + MAGNIFY_SCALE * falloff;
   });
-  const rawY = useTransform(mouseFraction, (value) => {
-    const distance = Math.abs(value - centerFraction) * slotCount;
-    if (distance > MAGNIFY_RADIUS) return 0;
-    const falloff = Math.exp(-((distance / (MAGNIFY_RADIUS * 0.55)) ** 2));
-    return -MAGNIFY_LIFT * falloff;
-  });
-
   return {
     scale: useSpring(rawScale, { stiffness: 320, damping: 20, mass: 0.4 }),
-    y: useSpring(rawY, { stiffness: 320, damping: 20, mass: 0.4 }),
+    y: useSpring(0, { stiffness: 260, damping: 26, mass: 0.5 }),
   };
 }
 
@@ -73,7 +65,15 @@ const DockIcon = forwardRef<
     onClick: () => void;
   }
 >(function DockIcon(
-  { icon: Icon, label, centerFraction, slotCount, mouseFraction, isActive, onClick },
+  {
+    icon: Icon,
+    label,
+    centerFraction,
+    slotCount,
+    mouseFraction,
+    isActive,
+    onClick,
+  },
   ref,
 ) {
   const { scale, y } = useMagnify(mouseFraction, centerFraction, slotCount);
@@ -84,7 +84,6 @@ const DockIcon = forwardRef<
       type="button"
       onClick={onClick}
       aria-label={label}
-      style={{ scale, y }}
       className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full text-[var(--color-text-primary)] md:h-14 md:w-14 lg:h-20 lg:w-20"
     >
       {isActive && (
@@ -94,7 +93,12 @@ const DockIcon = forwardRef<
           transition={{ type: "spring", stiffness: 350, damping: 25 }}
         />
       )}
-      <Icon className="relative z-10 h-4 w-4 md:h-5 md:w-5 lg:h-7 lg:w-7" />
+      <motion.span
+        style={{ scale, y }}
+        className="relative z-10 flex items-center justify-center"
+      >
+        <Icon className="h-4 w-4 md:h-5 md:w-5 lg:h-7 lg:w-7" />
+      </motion.span>
     </motion.button>
   );
 });
