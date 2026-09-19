@@ -125,9 +125,34 @@ export function LiquidDock({
   const MIN_DROP_SIZE = 16;
   const MAX_DROP_SIZE = 80;
   const dropSize = useSpring(MIN_DROP_SIZE, {
-    stiffness: 180,
-    damping: 22,
-    mass: 0.8,
+    /*     stiffness: 300,
+    damping: 20,
+    mass: 1, */
+
+    stiffness: 170,
+    damping: 26,
+    mass: 1,
+
+    /*
+
+    high stiffness + low damping = quick jumpy motion
+    low stiffness + high damping = smooth, liquid motion
+
+    Stiffness:
+      how strongly the spring pulls toward the target
+      higher value = faster, more forceful snap
+      lower value = softer, slower movement
+
+    Damping:
+      how much the motion is resisted
+      higher value = calmer, less wobble, more controlled
+      lower value = more bounce / overshoot
+
+    Mass:
+      how “heavy” the object feels
+      higher mass = slower, heavier motion
+      lower mass = quick, lighter motion
+*/
   });
 
   const slotCount = navItems.length + 1;
