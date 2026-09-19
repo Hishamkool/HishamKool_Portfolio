@@ -120,6 +120,7 @@ export function LiquidDock({
     mass: 0.7,
   });
   const [hovering, setHovering] = useState(false);
+  const [hoverTargetIndex, setHoverTargetIndex] = useState<number | null>(null);
 
   const slotCount = navItems.length + 1;
 
@@ -156,15 +157,59 @@ export function LiquidDock({
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect || rect.width === 0) return;
     const fraction = (event.clientX - rect.left) / rect.width;
+    const nearestIndex = centers.reduce<number | null>(
+      (closest, center, index) => {
+        if (closest === null) return index;
+        const currentDistance = Math.abs(center - fraction);
+        const closestDistance = Math.abs(centers[closest] - fraction);
+        return currentDistance < closestDistance ? index : closest;
+      },
+      null,
+    );
+
     mouseFraction.set(fraction);
     dropX.set(fraction);
+    setHoverTargetIndex(nearestIndex);
     setHovering(true);
   };
 
   const handleLeave = () => {
     mouseFraction.set(NO_HOVER);
+    setHoverTargetIndex(null);
     setHovering(false);
   };
+
+  const targetIndex = hoverTargetIndex ?? 0;
+  const activeTargetCenter = centers[targetIndex] ?? 0.5;
+  const activeTargetWidth =
+    itemRefs.current[targetIndex] && itemRefs.current[targetIndex]!.offsetWidth
+      ? itemRefs.current[targetIndex]!.offsetWidth
+      : 56;
+  const activeTargetHeight =
+    itemRefs.current[targetIndex] && itemRefs.current[targetIndex]!.offsetHeight
+      ? itemRefs.current[targetIndex]!.offsetHeight
+      : 56;
+
+  const blobX = useTransform(dropX, (value) => {
+    const targetPercent = (activeTargetCenter ?? 0.5) * 100;
+    const pointerPercent = value * 100;
+    const blend = targetPercent * 0.7 + pointerPercent * 0.3;
+    return `${blend}%`;
+  });
+
+  const blobWidth = useTransform(dropX, (value) => {
+    const distance = Math.abs(value - (activeTargetCenter ?? 0.5));
+    const influence =
+      hoverTargetIndex === null ? 0 : Math.max(0, 1 - distance / 0.2);
+    return `${Math.max(44, activeTargetWidth * (0.8 + influence * 0.9))}px`;
+  });
+
+  const blobHeight = useTransform(dropX, (value) => {
+    const distance = Math.abs(value - (activeTargetCenter ?? 0.5));
+    const influence =
+      hoverTargetIndex === null ? 0 : Math.max(0, 1 - distance / 0.2);
+    return `${Math.max(44, activeTargetHeight * (0.8 + influence * 0.9))}px`;
+  });
 
   const { scrollY } = useScroll();
   const sheenPosition = useTransform(
@@ -215,10 +260,25 @@ export function LiquidDock({
             style={{ filter: "url(#dock-goo)" }}
             className="absolute inset-0 z-0"
           >
-            <motion.span className="drop-blob" style={{ left: dropLeft }} />
+            <motion.span
+              className="drop-blob"
+              style={{
+                left: blobX,
+                width: blobWidth,
+                height: blobHeight,
+                top: "50%",
+                transform: "translate(-50%, -50%)",
+              }}
+            />
             <motion.span
               className="drop-blob drop-blob--trail"
-              style={{ left: dropTrailLeft }}
+              style={{
+                left: dropTrailLeft,
+                width: blobWidth,
+                height: blobHeight,
+                top: "50%",
+                transform: "translate(-50%, -50%)",
+              }}
             />
           </div>
         )}
