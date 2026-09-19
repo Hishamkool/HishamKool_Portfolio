@@ -261,7 +261,7 @@ export function LiquidDock({
       ref={containerRef}
       onMouseMove={handleMove}
       onMouseLeave={handleLeave}
-      className="liquid-glass pointer-events-auto relative flex max-w-full items-center gap-0.5 overflow-x-auto rounded-[28px] border border-[var(--color-border-glass)] bg-[var(--color-surface-glass)] p-1.5 shadow-[0_10px_40px_0_var(--shadow-glass)] no-scrollbar sm:gap-1 sm:p-2 md:gap-2 lg:gap-3 lg:rounded-[36px] lg:p-3"
+      className="liquid-glass pointer-events-auto relative flex max-w-full items-center gap-0.5 rounded-[28px] border border-[var(--color-border-glass)] bg-[var(--color-surface-glass)] p-1.5 shadow-[0_10px_40px_0_var(--shadow-glass)] sm:gap-1 sm:p-2 md:gap-2 lg:gap-3 lg:rounded-[36px] lg:p-3"
     >
       <svg
         width="0"
