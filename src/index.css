@@ -2,7 +2,8 @@
 
 :root {
   --color-bg-soft: #ffffff;
-  --color-surface: rgba(255, 255, 255, 0.72);
+  /* --color-surface: rgba(255, 255, 255, 0.72); */
+  --color-surface: rgba(148, 176, 255, 0.78);
   --color-surface-glass: rgba(255, 255, 255, 0.5);
   --color-accent-blue: #2f6fed;
   --color-accent: #0a0a0a;
@@ -178,15 +179,17 @@ a {
     rgba(148, 176, 255, 0.6) 55%,
     rgba(120, 150, 255, 0.05) 100%
   );
+  /* background: color-mix(in oklab, var(--color-surface) 80%, transparent); */
 }
 
 .dark .drop-blob {
-  background: radial-gradient(
+  /* background: radial-gradient(
     circle at 35% 30%,
     rgba(255, 255, 255, 0.55),
     rgba(120, 150, 255, 0.42) 55%,
     rgba(90, 120, 255, 0.05) 100%
-  );
+  ); */
+  background: color-mix(in oklab, var(--color-surface) 80%, transparent);
 }
 
 .drop-blob--trail {
