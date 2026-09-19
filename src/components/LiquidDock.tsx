@@ -207,7 +207,7 @@ export function LiquidDock({
 
   const targetDropSize = Math.min(
     MAX_DROP_SIZE,
-    Math.max(MIN_DROP_SIZE, activeTargetWidth * 0.9),
+    Math.max(MIN_DROP_SIZE, activeTargetWidth * 1),
   );
 
   useEffect(() => {
