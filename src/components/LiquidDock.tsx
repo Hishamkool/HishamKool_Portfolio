@@ -88,7 +88,7 @@ const DockIcon = forwardRef<
       type="button"
       onClick={onClick}
       aria-label={label}
-      className="group relative z-10 flex h-12 w-12 items-center justify-center rounded-full text-[var(--color-text-primary)] md:h-14 md:w-14 lg:h-20 lg:w-20"
+      className="group relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[var(--color-text-primary)] sm:h-11 sm:w-11 md:h-14 md:w-14 lg:h-20 lg:w-20"
     >
       {showHoverLabels && (
         <span className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-[var(--color-border-glass)] bg-[var(--color-surface-glass)] px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] text-[var(--color-text-primary)] uppercase opacity-0 shadow-[0_8px_24px_rgba(15,23,42,0.18)] transition-all duration-200 ease-out group-hover:translate-y-0 group-hover:opacity-100 group-hover:scale-100 group-focus-visible:opacity-100 md:-top-11 md:text-[11px]">
@@ -261,7 +261,7 @@ export function LiquidDock({
       ref={containerRef}
       onMouseMove={handleMove}
       onMouseLeave={handleLeave}
-      className="liquid-glass pointer-events-auto relative flex items-center gap-1.5 rounded-[28px] border border-[var(--color-border-glass)] bg-[var(--color-surface-glass)] p-2 shadow-[0_10px_40px_0_var(--shadow-glass)] md:gap-2 lg:gap-3 lg:rounded-[36px] lg:p-3"
+      className="liquid-glass pointer-events-auto relative flex max-w-full items-center gap-0.5 overflow-x-auto rounded-[28px] border border-[var(--color-border-glass)] bg-[var(--color-surface-glass)] p-1.5 shadow-[0_10px_40px_0_var(--shadow-glass)] no-scrollbar sm:gap-1 sm:p-2 md:gap-2 lg:gap-3 lg:rounded-[36px] lg:p-3"
     >
       <svg
         width="0"

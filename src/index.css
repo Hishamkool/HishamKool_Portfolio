@@ -2,8 +2,8 @@
 
 :root {
   --color-bg-soft: #ffffff;
-  /* --color-surface: rgba(255, 255, 255, 0.72); */
-  --color-surface: rgba(148, 176, 255, 0.78);
+  --color-surface: rgba(255, 255, 255, 0.72);
+  /* --color-surface: rgba(148, 176, 255, 0.78); */
   --color-surface-glass: rgba(255, 255, 255, 0.5);
   --color-accent-blue: #2f6fed;
   --color-accent: #0a0a0a;
@@ -194,6 +194,15 @@ a {
 
 .drop-blob--trail {
   opacity: 0.85;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

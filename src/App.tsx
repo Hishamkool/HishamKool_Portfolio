@@ -1,17 +1,21 @@
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  Award,
   ArrowRight,
   BriefcaseBusiness,
   Code2,
+  ExternalLink,
   FolderKanban,
   GraduationCap,
+  Heart,
   House,
+  Languages as LanguagesIcon,
   Mail,
   Sparkles,
-  Trophy,
+  User,
+  Users,
   Zap,
 } from "lucide-react";
-import { InView } from "react-intersection-observer";
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { LiquidDock } from "./components/LiquidDock";
@@ -31,124 +35,400 @@ type Project = {
   links: {
     github?: string;
     live?: string;
-    figma?: string;
   };
 };
 
-type SkillGroup = {
+type TimelineNode = {
+  id: string;
+  type: string;
   title: string;
-  items: { name: string; level: number; icon: typeof Code2 }[];
+  subtitle: string;
+  dateRange: string;
+  bullets: string[];
+  projects?: string;
+  icon: typeof BriefcaseBusiness;
+};
+
+type SkillCategory = {
+  title: string;
+  icon: typeof Code2;
+  items: string[];
+};
+
+type Certification = {
+  title: string;
+  org: string;
+  dateRange: string;
+  note?: string;
+  bullets?: string[];
+};
+
+type EducationEntry = {
+  degree: string;
+  school: string;
+  year: string;
+  detail: string;
+};
+
+type LanguageEntry = {
+  name: string;
+  level: string;
 };
 
 const navItems: NavItem[] = [
   { id: "home", label: "Home", icon: House },
+  { id: "about", label: "About", icon: User },
   { id: "road", label: "Timeline", icon: BriefcaseBusiness },
   { id: "projects", label: "Projects", icon: FolderKanban },
   { id: "skills", label: "Skills", icon: Sparkles },
+  { id: "credentials", label: "Credentials", icon: GraduationCap },
   { id: "contact", label: "Contact Me", icon: Mail },
 ];
 
-const timelineNodes = [
+const timelineNodes: TimelineNode[] = [
   {
-    id: "current",
-    type: "company",
-    title: "Senior Product Engineer",
-    subtitle: "Northstar Labs",
-    dateRange: "2023 — Present",
-    description:
-      "Leading UI systems and product experiences for fintech teams shipping polished internal tools.",
-    icon: "briefcase",
+    id: "grapes",
+    type: "Full-time",
+    title: "Junior Flutter Developer",
+    subtitle: "Grapes IDMR — Thrissur",
+    dateRange: "May 2024 — Mar 2025",
+    bullets: [
+      "Built and maintained cross-platform mobile apps using Flutter across healthcare, employee management, and smart control systems.",
+      "Designed responsive UIs using Figma and Justinmind, implemented in Flutter based on MVC and MVVM architectures; migrated apps from GetX to Provider for improved maintainability.",
+      "Integrated REST APIs, real-time updates, and Firebase Cloud Messaging (FCM).",
+      "Used Git for version control and collaboration.",
+    ],
+    projects: "CSSD, DiaLog, Grapes Office Log, Smart Device Management, MyHRM QR, NameBoard, BSA",
+    icon: BriefcaseBusiness,
   },
   {
-    id: "internship",
-    type: "internship",
-    title: "Frontend Intern",
-    subtitle: "Pixel Harbor",
-    dateRange: "2022",
-    description:
-      "Built workflow dashboards and improved conversion UX for a growing SaaS platform.",
-    icon: "rocket",
+    id: "famlaika",
+    type: "Part-time",
+    title: "Flutter Developer (Part-time)",
+    subtitle: "Famlaika — Remote",
+    dateRange: "Apr 2025 — Jun 2025",
+    bullets: [
+      "Improved code maintainability by separating UI from business logic using Provider and clean architectural practices.",
+      "Supported development workflows by introducing tools and practices that improved debugging and development efficiency.",
+      "Contributed to the development and enhancement of the Family Tree module, ensuring scalable data handling and intuitive UI behavior.",
+    ],
+    icon: Zap,
   },
   {
-    id: "degree",
-    type: "education",
-    title: "BSc. Computer Science",
-    subtitle: "University of Toronto",
-    dateRange: "2018 — 2022",
-    description:
-      "Focused on human-centered design, systems thinking, and modern frontend architecture.",
-    icon: "graduation",
+    id: "vonnue",
+    type: "Internship",
+    title: "Full Stack Developer Intern",
+    subtitle: "Vonnue — Sultan Bathery",
+    dateRange: "Jul 2025 — Mar 2026",
+    bullets: [
+      "Engaged in a comprehensive 6-month training and internship program centered on developing scalable and efficient web applications.",
+      "Gained hands-on experience with React.js, Tailwind CSS, JavaScript, HTML, and Firestore through real-world full stack development projects.",
+      "Designed and implemented dynamic, responsive user interfaces with a strong emphasis on clean, intuitive UI/UX.",
+    ],
+    projects:
+      "Recipedia, Daily Logs Calculator, Meal Cast, Dice Game, Amoled Clock, Doordash, AirBnb, Biosynthesis, Myntra (mobile view)",
+    icon: GraduationCap,
   },
   {
-    id: "award",
-    type: "achievement",
-    title: "Hackathon Winner",
-    subtitle: "Toronto Build Challenge",
-    dateRange: "2021",
-    description:
-      "Designed a cross-platform MVP recognized for accessibility, speed, and product clarity.",
-    icon: "trophy",
+    id: "benjamin",
+    type: "Freelance",
+    title: "Freelance Web Developer",
+    subtitle: "Benjamin Portfolio Website — Remote",
+    dateRange: "May 2026 — Jul 2026",
+    bullets: [
+      "Designed and developed a personal portfolio website for a freelance client (a designer and video editor), translating a custom Figma UI/UX design into a fully responsive, production site — benjamincs.com.",
+      "Built a parallax scrolling homepage along with a separate map-style interactive homepage, with distinct layouts and interactions for desktop and mobile.",
+      "Integrated Cloudinary to dynamically fetch and display the client's art/video portfolio, using self-generating scripts to auto-generate and list media items from the Cloudinary library.",
+      "Implemented a contact form using EmailJS for direct client inquiries without a backend server.",
+      "Deployed the site on Vercel and configured the custom domain via Hostinger.",
+    ],
+    projects: "GitHub: github.com/Hishamkool/portfolio_benjamin",
+    icon: Sparkles,
+  },
+  {
+    id: "leaderit",
+    type: "Full-time",
+    title: "Associate Software Developer",
+    subtitle: "LeaderIT — Trivandrum",
+    dateRange: "May 2026 — Present",
+    bullets: [
+      "Working on Automax, a workflow automation platform for managing business operations, user access, and organizational structure with enterprise-grade security.",
+      "Building and maintaining responsive front-end features using React.js, focused on clean, intuitive interfaces for complex operational workflows.",
+      "Expanding into cross-platform mobile development with React Native, applying core React concepts to build and test mobile-friendly features alongside the web application.",
+    ],
+    icon: BriefcaseBusiness,
   },
 ];
 
 const projects: Project[] = [
   {
-    title: "Atlas Commerce",
+    title: "Benjamin Portfolio",
+    category: "Freelance",
+    description:
+      "A fully responsive freelance portfolio for a designer & video editor — a parallax scrolling homepage and a separate map-style interactive homepage, with a Cloudinary-powered media library built from a custom Figma design.",
+    stack: ["React", "Tailwind CSS", "Cloudinary", "EmailJS", "Vercel"],
+    image:
+      "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?auto=format&fit=crop&w=900&q=80",
+    links: {
+      github: "https://github.com/Hishamkool/portfolio_benjamin",
+      live: "https://benjamincs.com",
+    },
+  },
+  {
+    title: "Automax",
     category: "React",
     description:
-      "A conversion-focused commerce experience with a headless CMS and personalized storefront flows.",
-    stack: ["React", "TypeScript", "Tailwind", "Stripe"],
+      "Enterprise workflow automation platform for managing business operations, user access, and organizational structure with enterprise-grade security. Expanding into React Native for mobile-friendly features.",
+    stack: ["React.js", "React Native", "Enterprise", "Workflow Automation"],
     image:
-      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80",
-    links: { github: "#", live: "#", figma: "#" },
+      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=900&q=80",
+    links: {},
   },
   {
-    title: "Pulse Mobile",
-    category: "Mobile",
+    title: "Recipedia",
+    category: "React",
     description:
-      "A wellness dashboard for tracking habits, routines, and daily insights with offline-ready UX.",
-    stack: ["Flutter", "Firebase", "Design System"],
+      "A recipe discovery app with search and category browsing, built during the Vonnue full-stack internship.",
+    stack: ["React", "Tailwind CSS", "JavaScript"],
     image:
-      "https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=900&q=80",
-    links: { github: "#", live: "#" },
+      "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=900&q=80",
+    links: {},
   },
   {
-    title: "Northwind Studio",
-    category: "Flutter",
+    title: "Daily Logs Calculator",
+    category: "React",
     description:
-      "A visual portfolio platform for agencies shipping branded interactive case studies.",
-    stack: ["Flutter", "GraphQL", "Motion"],
+      "A utility app for tracking and calculating daily work and activity logs, with a clean, form-driven interface.",
+    stack: ["React", "Tailwind CSS", "JavaScript"],
     image:
       "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80",
-    links: { live: "#", figma: "#" },
+    links: {},
+  },
+  {
+    title: "Meal Cast",
+    category: "React",
+    description:
+      "A meal planning and forecasting interface with a clean, card-based UI for browsing and organizing meals.",
+    stack: ["React", "Tailwind CSS", "JavaScript"],
+    image:
+      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80",
+    links: {},
+  },
+  {
+    title: "Dice Game",
+    category: "React",
+    description:
+      "An interactive dice game with real-time state updates and score tracking.",
+    stack: ["React", "JavaScript"],
+    image:
+      "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=900&q=80",
+    links: {},
+  },
+  {
+    title: "Amoled Clock",
+    category: "React",
+    description:
+      "A minimal, dark-themed digital clock UI optimized for AMOLED screens.",
+    stack: ["React", "Tailwind CSS"],
+    image:
+      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80",
+    links: {},
+  },
+  {
+    title: "Doordash (Clone)",
+    category: "React",
+    description:
+      "A food delivery UI clone focused on responsive restaurant listings and cart flows.",
+    stack: ["React", "Tailwind CSS", "JavaScript"],
+    image:
+      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80",
+    links: {},
+  },
+  {
+    title: "AirBnb (Clone)",
+    category: "React",
+    description:
+      "A property listing and booking UI clone with search, filters, and a responsive listing grid.",
+    stack: ["React", "Tailwind CSS", "JavaScript"],
+    image:
+      "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=900&q=80",
+    links: {},
+  },
+  {
+    title: "Biosynthesis",
+    category: "React",
+    description:
+      "An educational interactive UI visualizing the biosynthesis process, built with Firestore-backed content.",
+    stack: ["React", "Tailwind CSS", "Firestore"],
+    image:
+      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80",
+    links: {},
+  },
+  {
+    title: "CSSD",
+    category: "Flutter",
+    description:
+      "A Central Sterile Services Department app streamlining hospital sterilization workflow tracking.",
+    stack: ["Flutter", "Dart", "Provider", "Firebase"],
+    image:
+      "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=900&q=80",
+    links: {},
+  },
+  {
+    title: "DiaLog",
+    category: "Flutter",
+    description:
+      "A patient health-log tracking app for recording and monitoring daily diagnostics.",
+    stack: ["Flutter", "Dart", "Provider", "Firebase"],
+    image:
+      "https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=900&q=80",
+    links: {},
+  },
+  {
+    title: "Grapes Office Log",
+    category: "Flutter",
+    description:
+      "An employee attendance and office activity log management app for internal operations.",
+    stack: ["Flutter", "Dart", "Provider", "Firebase"],
+    image:
+      "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=900&q=80",
+    links: {},
+  },
+  {
+    title: "Smart Device Management",
+    category: "Flutter",
+    description:
+      "An app for controlling and monitoring connected smart devices with real-time status updates.",
+    stack: ["Flutter", "Dart", "Provider", "Firebase Cloud Messaging"],
+    image:
+      "https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=900&q=80",
+    links: {},
+  },
+  {
+    title: "MyHRM QR",
+    category: "Flutter",
+    description:
+      "A QR-based HR management app for employee check-in/check-out and attendance records.",
+    stack: ["Flutter", "Dart", "Provider", "REST API"],
+    image:
+      "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=900&q=80",
+    links: {},
+  },
+  {
+    title: "NameBoard",
+    category: "Flutter",
+    description:
+      "A digital nameboard and smart signage display management app for kiosk-style screens.",
+    stack: ["Flutter", "Dart", "MVC"],
+    image:
+      "https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=900&q=80",
+    links: {},
+  },
+  {
+    title: "BSA",
+    category: "Flutter",
+    description:
+      "A streamlined workflow app for internal operations and reporting, built as part of the Grapes IDMR suite.",
+    stack: ["Flutter", "Dart", "MVVM"],
+    image:
+      "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=900&q=80",
+    links: {},
   },
 ];
 
-const skillGroups: SkillGroup[] = [
+const skillCategories: SkillCategory[] = [
   {
-    title: "Languages",
+    title: "Hard Skills",
+    icon: Code2,
     items: [
-      { name: "TypeScript", level: 96, icon: Code2 },
-      { name: "JavaScript", level: 90, icon: Code2 },
-      { name: "Dart", level: 80, icon: Code2 },
+      "React.js",
+      "React Native",
+      "Tailwind CSS",
+      "JavaScript",
+      "HTML",
+      "Flutter",
+      "Dart",
+      "Java",
+      "Python",
+      "C",
+      "C++",
+      "Provider (State Management)",
+      "MVC",
+      "MVVM",
+      "Firebase (Auth, Cloud Messaging)",
+      "REST API Integration (Dio, Retrofit)",
+      "Cloudinary",
+      "EmailJS",
+      "Git",
+      "GitHub",
+      "Vercel",
+      "Android Studio",
+      "VS Code",
+      "Figma",
     ],
   },
   {
-    title: "Frameworks",
+    title: "Soft Skills",
+    icon: Users,
     items: [
-      { name: "React", level: 95, icon: Code2 },
-      { name: "Next.js", level: 88, icon: Code2 },
-      { name: "Flutter", level: 82, icon: Code2 },
+      "Attention to Detail",
+      "Communication",
+      "Results-Driven",
+      "Task Prioritization",
+      "Continuous Improvement",
     ],
   },
   {
-    title: "Tools",
-    items: [
-      { name: "Figma", level: 86, icon: Code2 },
-      { name: "GitHub", level: 92, icon: Code2 },
-      { name: "Motion", level: 84, icon: Code2 },
+    title: "Interests",
+    icon: Heart,
+    items: ["Travel", "Photography", "Fitness", "Meditation", "Singing"],
+  },
+];
+
+const certifications: Certification[] = [
+  {
+    title: "Android Development Expert (Flutter and Java) Certification",
+    org: "Luminar Technolab",
+    dateRange: "Aug 2023",
+    note: "Certificate: nactetindia.org | Muhammed Hisham, 34152",
+  },
+  {
+    title: "Flutter Development Training",
+    org: "Luminar Technolab, Calicut",
+    dateRange: "May 2023 – Aug 2023",
+    bullets: [
+      "Focused on Dart, API integration, plugin usage, and responsive UI development using Flutter.",
+      "Built real-world apps: News App, Movie App, Hotel Booking App, Exotic Car App, Instagram Clone",
     ],
   },
+];
+
+const education: EducationEntry[] = [
+  {
+    degree: "B.Tech in Computer Science and Engineering",
+    school: "Prist University, Vallam, Thanjavur",
+    year: "2023",
+    detail: "GPA: 6.95",
+  },
+  {
+    degree: "Higher Secondary Certificate (HSC), Computer Science",
+    school: "Cordite Factory Hr. Sec. School, Aruvankadu",
+    year: "2017",
+    detail: "71.6%",
+  },
+  {
+    degree: "Secondary School Certificate (SSC), CBSE",
+    school: "Kendriya Vidyalaya, Aruvankadu",
+    year: "2015",
+    detail: "CGPA: 9.2",
+  },
+];
+
+const languages: LanguageEntry[] = [
+  { name: "English", level: "Full Professional Proficiency" },
+  { name: "Hindi", level: "Full Professional Proficiency" },
+  { name: "Tamil", level: "Native / Bilingual Proficiency" },
+  { name: "Malayalam", level: "Native Proficiency" },
 ];
 
 const easing = [0.22, 1, 0.36, 1] as const;
@@ -175,18 +455,11 @@ function App() {
   const [projectFilter, setProjectFilter] = useState("All");
   const showDockHoverLabels = true;
 
-  const filters = useMemo(
-    () => ["All", "React", "Flutter", "Mobile", "Design"],
-    [],
-  );
+  const filters = useMemo(() => ["All", "React", "Flutter", "Freelance"], []);
 
   const filteredProjects = useMemo(() => {
     if (projectFilter === "All") return projects;
-    return projects.filter(
-      (project) =>
-        project.category === projectFilter ||
-        (projectFilter === "Design" && project.stack.includes("Design System")),
-    );
+    return projects.filter((project) => project.category === projectFilter);
   }, [projectFilter]);
 
   useEffect(() => {
@@ -209,22 +482,38 @@ function App() {
   }, [theme]);
 
   useEffect(() => {
-    const sections = document.querySelectorAll("section[id]");
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible) {
-          setActiveSection(visible.target.id);
+    const sectionIds = navItems.map((item) => item.id);
+    const SCROLL_OFFSET = 160;
+
+    const updateActiveSection = () => {
+      const scrollPosition = window.scrollY + SCROLL_OFFSET;
+      let current = sectionIds[0];
+
+      for (const id of sectionIds) {
+        const section = document.getElementById(id);
+        if (section && section.offsetTop <= scrollPosition) {
+          current = id;
         }
-      },
-      { threshold: [0.4, 0.6, 0.8] },
-    );
+      }
 
-    sections.forEach((section) => observer.observe(section));
+      const atBottom =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 2;
+      if (atBottom) {
+        current = sectionIds[sectionIds.length - 1];
+      }
 
-    return () => observer.disconnect();
+      setActiveSection(current);
+    };
+
+    updateActiveSection();
+    window.addEventListener("scroll", updateActiveSection, { passive: true });
+    window.addEventListener("resize", updateActiveSection);
+
+    return () => {
+      window.removeEventListener("scroll", updateActiveSection);
+      window.removeEventListener("resize", updateActiveSection);
+    };
   }, []);
 
   const scrollToSection = (id: string) => {
@@ -273,26 +562,23 @@ function App() {
             <div className="space-y-8">
               <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border-glass)] bg-[var(--color-surface-glass)] px-3 py-1.5 text-xs font-medium uppercase tracking-[0.2em] text-[var(--color-text-secondary)] backdrop-blur-xl">
                 <Zap className="h-3.5 w-3.5" />
-                Available for product design & development
+                Available for React.js & Flutter opportunities
               </div>
 
               <div className="space-y-5">
                 <p className="text-sm uppercase tracking-[0.28em] text-[var(--color-text-muted)]">
-                  Hisham Kool
+                  Muhammed Hisham
                 </p>
                 <h1 className="max-w-xl text-5xl font-semibold tracking-[-0.08em] text-[var(--color-text-primary)] md:text-7xl">
-                  Building calm,
+                  React.js Developer
                   <span className="block text-[var(--color-accent-blue)]">
-                    high-converting
+                    & Flutter Developer
                   </span>
-                  digital products.
                 </h1>
               </div>
 
               <p className="max-w-lg text-lg leading-8 text-[var(--color-text-secondary)]">
-                I design and build beautiful, human-centered experiences for
-                startups and product teams that care about clarity, motion, and
-                measurable growth.
+                Building clean, responsive interfaces for web and mobile.
               </p>
 
               <div className="flex flex-wrap items-center gap-3">
@@ -309,8 +595,29 @@ function App() {
                   onClick={() => scrollToSection("contact")}
                   className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border-glass)] bg-[var(--color-surface-glass)] px-5 py-3 text-sm font-medium text-[var(--color-text-primary)] backdrop-blur-xl"
                 >
-                  Contact
+                  Contact Me
                 </button>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3 pt-1">
+                <a
+                  href="https://linkedin.com/in/hisham-ka"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border-glass)] bg-[var(--color-surface-glass)] px-4 py-2 text-xs font-medium uppercase tracking-[0.18em] text-[var(--color-text-secondary)] backdrop-blur-xl transition-colors hover:text-[var(--color-text-primary)]"
+                >
+                  LinkedIn
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+                <a
+                  href="https://github.com/Hishamkool"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border-glass)] bg-[var(--color-surface-glass)] px-4 py-2 text-xs font-medium uppercase tracking-[0.18em] text-[var(--color-text-secondary)] backdrop-blur-xl transition-colors hover:text-[var(--color-text-primary)]"
+                >
+                  GitHub
+                  <ExternalLink className="h-3 w-3" />
+                </a>
               </div>
             </div>
 
@@ -333,25 +640,25 @@ function App() {
                   <div className="space-y-3">
                     <div>
                       <p className="text-[var(--color-text-muted)]">
-                        Currently shipping
+                        Currently building
                       </p>
                       <h2 className="mt-2 text-2xl font-semibold text-[var(--color-text-primary)]">
-                        Design systems + product UX
+                        Automax — enterprise workflow automation
                       </h2>
                     </div>
                     <div className="grid grid-cols-2 gap-3 pt-2 text-sm text-[var(--color-text-secondary)]">
                       <div className="rounded-2xl border border-[var(--color-border-glass)] bg-[var(--color-surface)]/60 p-3">
                         <p className="text-[var(--color-text-muted)]">Years</p>
                         <p className="mt-1 text-xl font-semibold text-[var(--color-text-primary)]">
-                          6+
+                          2+
                         </p>
                       </div>
                       <div className="rounded-2xl border border-[var(--color-border-glass)] bg-[var(--color-surface)]/60 p-3">
                         <p className="text-[var(--color-text-muted)]">
-                          Launches
+                          Apps Shipped
                         </p>
                         <p className="mt-1 text-xl font-semibold text-[var(--color-text-primary)]">
-                          34
+                          6+
                         </p>
                       </div>
                     </div>
@@ -360,6 +667,56 @@ function App() {
               </GlassPanel>
             </motion.div>
           </motion.div>
+        </section>
+
+        <section id="about" className="scroll-mt-28 py-12 md:py-14">
+          <div className="mb-8">
+            <p className="text-xs uppercase tracking-[0.24em] text-[var(--color-text-muted)]">
+              About
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.06em] text-[var(--color-text-primary)] md:text-5xl">
+              Professional Summary
+            </h2>
+          </div>
+
+          <GlassPanel className="p-6 md:p-8">
+            <p className="max-w-3xl text-lg leading-8 text-[var(--color-text-secondary)]">
+              Frontend Developer with 2+ years of experience building
+              responsive web and mobile applications, currently focused on
+              React.js and expanding into React Native. Delivered 6+
+              cross-platform mobile apps using Flutter across healthcare,
+              workforce, and smart system domains, improving UI responsiveness
+              by up to 60% through adaptive layouts for mobile, tablet, and
+              kiosk screens. Skilled in building clean, maintainable
+              interfaces using React.js and Tailwind CSS, with a strong
+              foundation in state management (Provider), REST API
+              integration, and real-time features via Firebase. Currently
+              contributing to Automax, an enterprise workflow automation
+              platform, while continuing to grow expertise across the React
+              ecosystem.
+            </p>
+
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {[
+                { label: "Years Experience", value: "2+" },
+                { label: "Apps Shipped", value: "6+" },
+                { label: "UI Responsiveness Gain", value: "60%" },
+                { label: "Companies & Clients", value: "5" },
+              ].map((stat) => (
+                <div
+                  key={stat.label}
+                  className="rounded-2xl border border-[var(--color-border-glass)] bg-[var(--color-surface)]/60 p-3"
+                >
+                  <p className="text-xl font-semibold text-[var(--color-text-primary)]">
+                    {stat.value}
+                  </p>
+                  <p className="mt-1 text-xs uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
+                    {stat.label}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </GlassPanel>
         </section>
 
         <section id="road" className="scroll-mt-28 py-12 md:py-14">
@@ -385,14 +742,7 @@ function App() {
                 className="relative pl-12"
               >
                 <div className="absolute left-0 top-4 flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-border-glass)] bg-[var(--color-surface)] text-[var(--color-accent-blue)] shadow-[0_6px_20px_0_var(--shadow-card)]">
-                  {node.icon === "briefcase" && (
-                    <BriefcaseBusiness className="h-4 w-4" />
-                  )}
-                  {node.icon === "rocket" && <Zap className="h-4 w-4" />}
-                  {node.icon === "graduation" && (
-                    <GraduationCap className="h-4 w-4" />
-                  )}
-                  {node.icon === "trophy" && <Trophy className="h-4 w-4" />}
+                  <node.icon className="h-4 w-4" />
                 </div>
                 <GlassPanel className="p-5 md:p-6">
                   <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -411,13 +761,28 @@ function App() {
                       {node.dateRange}
                     </span>
                   </div>
-                  <p className="mt-4 max-w-2xl text-[var(--color-text-secondary)]">
-                    {node.description}
-                  </p>
+                  <ul className="mt-4 max-w-2xl list-disc space-y-1.5 pl-4 text-[var(--color-text-secondary)]">
+                    {node.bullets.map((bullet) => (
+                      <li key={bullet}>{bullet}</li>
+                    ))}
+                  </ul>
+                  {node.projects && (
+                    <p className="mt-4 text-sm text-[var(--color-text-muted)]">
+                      <span className="uppercase tracking-[0.14em]">
+                        Projects:
+                      </span>{" "}
+                      {node.projects}
+                    </p>
+                  )}
                 </GlassPanel>
               </motion.article>
             ))}
           </div>
+
+          <p className="mt-8 pl-12 text-sm text-[var(--color-text-muted)]">
+            Early Experience: Cabin4 — Aug 2019 – Feb 2020 (college-level
+            internship)
+          </p>
         </section>
 
         <section id="projects" className="scroll-mt-28 py-12 md:py-14">
@@ -485,32 +850,27 @@ function App() {
                       <span className="rounded-full border border-[var(--color-border-glass)] bg-[var(--color-surface-glass)] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-[var(--color-text-secondary)]">
                         {project.category}
                       </span>
-                      <div className="flex items-center gap-2 text-[var(--color-text-muted)]">
+                      <div className="flex items-center gap-3 text-[var(--color-text-muted)]">
                         {project.links.github && (
                           <a
                             href={project.links.github}
+                            target="_blank"
+                            rel="noreferrer"
                             aria-label="GitHub"
                             className="hover:text-[var(--color-text-primary)]"
                           >
-                            GH
+                            Code
                           </a>
                         )}
                         {project.links.live && (
                           <a
                             href={project.links.live}
+                            target="_blank"
+                            rel="noreferrer"
                             aria-label="Live"
                             className="hover:text-[var(--color-text-primary)]"
                           >
                             Live
-                          </a>
-                        )}
-                        {project.links.figma && (
-                          <a
-                            href={project.links.figma}
-                            aria-label="Figma"
-                            className="hover:text-[var(--color-text-primary)]"
-                          >
-                            Figma
                           </a>
                         )}
                       </div>
@@ -553,54 +913,142 @@ function App() {
           </div>
 
           <div className="grid gap-5 lg:grid-cols-3">
-            {skillGroups.map((group) => (
-              <div key={group.title} className="space-y-4">
-                <p className="text-xs uppercase tracking-[0.24em] text-[var(--color-text-muted)]">
-                  {group.title}
-                </p>
-                <div className="space-y-3">
-                  {group.items.map((skill) => (
-                    <InView
-                      key={skill.name}
-                      threshold={0.5}
-                      triggerOnce
-                      className="block"
-                    >
-                      {({ inView, ref }) => (
-                        <div
-                          ref={ref}
-                          className="rounded-[20px] border border-[var(--color-border-glass)] bg-[var(--color-surface)]/70 p-4 shadow-[0_8px_18px_0_var(--shadow-card)]"
-                        >
-                          <div className="mb-3 flex items-center justify-between gap-4">
-                            <div className="flex items-center gap-3">
-                              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-[var(--color-accent-blue)]">
-                                <skill.icon className="h-4 w-4" />
-                              </div>
-                              <span className="font-medium text-[var(--color-text-primary)]">
-                                {skill.name}
-                              </span>
-                            </div>
-                            <span className="text-xs uppercase tracking-[0.18em] text-[var(--color-text-muted)]">
-                              {skill.level}%
-                            </span>
-                          </div>
-                          <div className="h-2 overflow-hidden rounded-full bg-[var(--color-bg-soft)]">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{
-                                width: inView ? `${skill.level}%` : "0%",
-                              }}
-                              transition={{ duration: 0.8, ease: easing }}
-                              className="h-full rounded-full bg-[linear-gradient(90deg,_rgba(67,112,255,0.94),_rgba(109,142,255,0.8))]"
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </InView>
-                  ))}
-                </div>
-              </div>
+            {skillCategories.map((category, index) => (
+              <motion.div
+                key={category.title}
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.5, ease: easing, delay: index * 0.08 }}
+              >
+                <GlassPanel className="h-full p-5 md:p-6">
+                  <div className="mb-4 flex items-center gap-3">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-[var(--color-accent-blue)]">
+                      <category.icon className="h-4 w-4" />
+                    </div>
+                    <p className="text-sm font-medium uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+                      {category.title}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {category.items.map((item) => (
+                      <span
+                        key={item}
+                        className="rounded-full border border-[var(--color-border-glass)] bg-[var(--color-surface)]/70 px-3 py-1.5 text-xs text-[var(--color-text-secondary)]"
+                      >
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </GlassPanel>
+              </motion.div>
             ))}
+          </div>
+        </section>
+
+        <section id="credentials" className="scroll-mt-28 py-12 md:py-14">
+          <div className="mb-8">
+            <p className="text-xs uppercase tracking-[0.24em] text-[var(--color-text-muted)]">
+              Background
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.06em] text-[var(--color-text-primary)] md:text-5xl">
+              Credentials
+            </h2>
+          </div>
+
+          <div className="grid gap-5 lg:grid-cols-3">
+            <GlassPanel className="p-5 md:p-6">
+              <div className="mb-4 flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-[var(--color-accent-blue)]">
+                  <Award className="h-4 w-4" />
+                </div>
+                <p className="text-sm font-medium uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+                  Certifications & Training
+                </p>
+              </div>
+              <div className="space-y-5">
+                {certifications.map((cert) => (
+                  <div key={cert.title}>
+                    <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-text-muted)]">
+                      {cert.dateRange}
+                    </p>
+                    <h3 className="mt-1 font-semibold text-[var(--color-text-primary)]">
+                      {cert.title}
+                    </h3>
+                    <p className="text-sm text-[var(--color-text-secondary)]">
+                      {cert.org}
+                    </p>
+                    {cert.bullets && (
+                      <ul className="mt-2 list-disc space-y-1 pl-4 text-sm text-[var(--color-text-secondary)]">
+                        {cert.bullets.map((bullet) => (
+                          <li key={bullet}>{bullet}</li>
+                        ))}
+                      </ul>
+                    )}
+                    {cert.note && (
+                      <p className="mt-2 text-xs text-[var(--color-text-muted)]">
+                        {cert.note}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </GlassPanel>
+
+            <GlassPanel className="p-5 md:p-6">
+              <div className="mb-4 flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-[var(--color-accent-blue)]">
+                  <GraduationCap className="h-4 w-4" />
+                </div>
+                <p className="text-sm font-medium uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+                  Education
+                </p>
+              </div>
+              <div className="space-y-5">
+                {education.map((entry) => (
+                  <div key={entry.degree}>
+                    <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-text-muted)]">
+                      {entry.year}
+                    </p>
+                    <h3 className="mt-1 font-semibold text-[var(--color-text-primary)]">
+                      {entry.degree}
+                    </h3>
+                    <p className="text-sm text-[var(--color-text-secondary)]">
+                      {entry.school}
+                    </p>
+                    <p className="mt-1 text-xs text-[var(--color-text-muted)]">
+                      {entry.detail}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </GlassPanel>
+
+            <GlassPanel className="p-5 md:p-6">
+              <div className="mb-4 flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-[var(--color-accent-blue)]">
+                  <LanguagesIcon className="h-4 w-4" />
+                </div>
+                <p className="text-sm font-medium uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+                  Languages
+                </p>
+              </div>
+              <div className="space-y-3">
+                {languages.map((language) => (
+                  <div
+                    key={language.name}
+                    className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--color-border-glass)] bg-[var(--color-surface)]/60 px-3 py-2.5"
+                  >
+                    <span className="font-medium text-[var(--color-text-primary)]">
+                      {language.name}
+                    </span>
+                    <span className="text-right text-xs text-[var(--color-text-secondary)]">
+                      {language.level}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </GlassPanel>
           </div>
         </section>
 
@@ -613,12 +1061,32 @@ function App() {
               <h2 className="mt-3 text-3xl font-semibold tracking-[-0.06em] text-[var(--color-text-primary)] md:text-5xl">
                 Let’s build the next release.
               </h2>
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <a
+                  href="https://linkedin.com/in/hisham-ka"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border-glass)] bg-[var(--color-surface-glass)] px-4 py-2 text-xs font-medium uppercase tracking-[0.18em] text-[var(--color-text-secondary)] backdrop-blur-xl transition-colors hover:text-[var(--color-text-primary)]"
+                >
+                  LinkedIn
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+                <a
+                  href="https://github.com/Hishamkool"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border-glass)] bg-[var(--color-surface-glass)] px-4 py-2 text-xs font-medium uppercase tracking-[0.18em] text-[var(--color-text-secondary)] backdrop-blur-xl transition-colors hover:text-[var(--color-text-primary)]"
+                >
+                  GitHub
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              </div>
             </div>
             <a
-              href="mailto:hello@hishamkool.dev"
+              href="mailto:hishamkool@yahoo.com"
               className="inline-flex items-center gap-2 rounded-full bg-[var(--color-accent-blue)] px-5 py-3 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(47,111,237,0.35)]"
             >
-              hello@hishamkool.dev
+              hishamkool@yahoo.com
               <ArrowRight className="h-4 w-4" />
             </a>
           </GlassPanel>
